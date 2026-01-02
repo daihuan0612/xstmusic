@@ -37,23 +37,14 @@ export async function onRequest(context: any) {
   const url = new URL(request.url);
   const pathname = url.pathname;
   
-  // 允许访问的路径列表
-  const allowedPaths = [
-    '/login',
-    '/api/login'
-  ];
+  // 允许访问登录页面和登录API
+  if (pathname === '/login' || pathname === '/api/login') {
+    return context.next();
+  }
   
-  // 允许访问的文件扩展名
-  const allowedExtensions = [
-    '.css', '.js', '.png', '.svg', '.jpg', '.jpeg', '.gif',
-    '.ico', '.webp', '.woff', '.woff2', '.ttf', '.otf'
-  ];
-  
-  // 检查是否为静态资源
-  const isStaticResource = allowedExtensions.some(ext => pathname.endsWith(ext));
-  
-  // 允许访问登录页面、登录API和静态资源
-  if (allowedPaths.includes(pathname) || isStaticResource) {
+  // 允许访问静态资源
+  const isStaticResource = hasPublicExtension(pathname);
+  if (isStaticResource) {
     return context.next();
   }
   
@@ -74,7 +65,11 @@ export async function onRequest(context: any) {
     }
     
     // 未登录或密码错误，重定向到登录页
-    return Response.redirect(new URL('/login', url).toString(), 302);
+    // 构造正确的重定向URL
+    const loginUrl = new URL(request.url);
+    loginUrl.pathname = '/login';
+    loginUrl.search = '';
+    return Response.redirect(loginUrl.toString(), 302);
   }
   
   // 密码为空字符串或未设置，直接通过
