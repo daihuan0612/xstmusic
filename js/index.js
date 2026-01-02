@@ -633,6 +633,27 @@ function buildAudioProxyUrl(url) {
     }
 }
 
+// 为QQ音乐等特殊源构建图片代理URL
+function buildImageProxyUrl(url) {
+    if (!url || typeof url !== "string") return url;
+    
+    // 如果URL已经是当前域名下的，不需要代理
+    try {
+        const parsedUrl = new URL(url, window.location.href);
+        if (parsedUrl.origin === window.location.origin) {
+            return url;
+        }
+        
+        // 对于外部图片，尝试通过API代理
+        const proxyUrl = new URL('/api/proxy', window.location.origin);
+        proxyUrl.searchParams.set('url', encodeURIComponent(url));
+        return proxyUrl.toString();
+    } catch (error) {
+        console.warn("无法构建图片代理URL，返回原URL", error);
+        return url;
+    }
+}
+
 const SOURCE_OPTIONS = [
     { value: "netease", label: "网易云音乐" },
     // { value: "kuwo", label: "酷我音乐" }, // 酷我音乐功能暂未修复，已禁用
@@ -1947,67 +1968,130 @@ loadStoredPalettes();
 
 // 本地取色逻辑：使用 Canvas API 从图片中提取颜色
 function getLocalPalette(imageUrl) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         console.log('🎨 开始本地取色，图片URL:', imageUrl);
         
-        const img = new Image();
-        // 添加crossOrigin属性，确保能获取像素数据
-        img.crossOrigin = "anonymous";
+        // 针对QQ音乐、网易云音乐等特殊域名，尝试通过代理获取图片
+        const isQQMusic = imageUrl.includes('qq.com') || imageUrl.includes('y.qq.com');
+        const isNeteaseMusic = imageUrl.includes('music.163.com') || imageUrl.includes('126.net') || imageUrl.includes('netease.com');
         
-        img.onload = () => {
-            console.log('✅ 图片加载成功，尺寸:', img.width, 'x', img.height);
+        let processedImageUrl = imageUrl;
+        
+        // 如果是QQ音乐或网易云音乐的图片，尝试通过图片代理获取
+        if (isQQMusic || isNeteaseMusic) {
+            console.log(isQQMusic ? '🎵 检测到QQ音乐图片，尝试通过图片代理获取' : '🎵 检测到网易云音乐图片，尝试通过图片代理获取');
             try {
-                const canvas = document.createElement("canvas");
-                const ctx = canvas.getContext("2d");
-                
-                // 调整画布大小，缩小图片以提高性能
-                const maxSize = 200;
-                let width = img.width;
-                let height = img.height;
-                
-                if (width > height && width > maxSize) {
-                    height = Math.round((height * maxSize) / width);
-                    width = maxSize;
-                } else if (height > maxSize) {
-                    width = Math.round((width * maxSize) / height);
-                    height = maxSize;
-                }
-                
-                canvas.width = width;
-                canvas.height = height;
-                
-                // 绘制图片到画布
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                // 获取像素数据
-                let imageData;
+                // 尝试使用图片代理函数
+                processedImageUrl = buildImageProxyUrl(imageUrl);
+                console.log('🔗 使用代理URL:', processedImageUrl);
+            } catch (proxyError) {
+                console.warn('⚠️ 图片代理获取失败，回退到原URL:', proxyError.message);
+                processedImageUrl = imageUrl;
+            }
+        }
+        
+        // 尝试使用fetch方式获取图片，以绕过跨域限制
+        try {
+            const response = await fetch(processedImageUrl);
+            if (!response.ok) {
+                throw new Error(`图片获取失败: ${response.status} ${response.statusText}`);
+            }
+            
+            const blob = await response.blob();
+            
+            // 创建一个对象URL来从blob加载图片
+            const objectUrl = URL.createObjectURL(blob);
+            
+            const img = new Image();
+            
+            img.onload = () => {
+                console.log('✅ 图片加载成功，尺寸:', img.width, 'x', img.height);
                 try {
-                    imageData = ctx.getImageData(0, 0, width, height);
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    
+                    // 调整画布大小，缩小图片以提高性能
+                    const maxSize = 200;
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > height && width > maxSize) {
+                        height = Math.round((height * maxSize) / width);
+                        width = maxSize;
+                    } else if (height > maxSize) {
+                        width = Math.round((width * maxSize) / height);
+                        height = maxSize;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // 绘制图片到画布
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // 获取像素数据
+                    const imageData = ctx.getImageData(0, 0, width, height);
                     console.log('📊 成功获取像素数据，像素数:', imageData.data.length / 4);
-                } catch (crossOriginError) {
-                    console.warn('❌ 跨域图片无法提取颜色，使用基于URL的颜色生成方案:', crossOriginError.message);
                     
-                    // 基于URL哈希生成主题色，确保同一图片始终生成相同颜色
-                    const hash = Array.from(imageUrl).reduce((acc, char) => {
-                        acc = ((acc << 5) - acc) + char.charCodeAt(0);
-                        return acc & acc;
-                    }, 0);
+                    const data = imageData.data;
                     
-                    // 使用哈希生成一个一致的主题色
-                    const hue = Math.abs(hash % 360);
-                    const saturation = 60 + Math.abs(hash % 20);
-                    const lightness = 65 + Math.abs(hash % 10);
+                    // 改进的颜色提取：计算平均颜色
+                    let r = 0, g = 0, b = 0, count = 0;
                     
-                    // 创建基于URL的调色板
-                    const hex = `#${((1 << 24) + ((hue * 0.7) << 16) + ((saturation * 2.55) << 8) + (lightness * 2.55)).toString(16).slice(1)}`;
+                    for (let i = 0; i < data.length; i += 4) {
+                        const alpha = data[i + 3];
+                        if (alpha > 128) { // 只考虑不透明的像素
+                            r += data[i];
+                            g += data[i + 1];
+                            b += data[i + 2];
+                            count++;
+                        }
+                    }
                     
+                    if (count === 0) {
+                        console.warn('⚠️ 没有找到不透明像素，使用默认调色板');
+                        // 返回默认调色板
+                        const defaultPalette = {
+                            gradients: {
+                                light: {
+                                    gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                                },
+                                dark: {
+                                    gradient: "linear-gradient(135deg, #2c3e50 0%, #34495e 100%)"
+                                }
+                            },
+                            tokens: {
+                                light: {
+                                    primaryColor: "#667eea",
+                                    primaryColorDark: "#764ba2"
+                                },
+                                dark: {
+                                    primaryColor: "#3498db",
+                                    primaryColorDark: "#2980b9"
+                                }
+                            }
+                        };
+                        resolve(defaultPalette);
+                        return;
+                    }
+                    
+                    // 计算平均颜色
+                    r = Math.round(r / count);
+                    g = Math.round(g / count);
+                    b = Math.round(b / count);
+                    
+                    // 创建主题色
+                    const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+                    console.log('🎨 提取到主题色:', hex);
+                    
+                    // 创建明显的渐变效果
                     const palette = {
                         gradients: {
                             light: {
-                                gradient: `linear-gradient(135deg, ${hex} 0%, ${hex}bb 50%, ${hex}99 100%)`
+                                gradient: `linear-gradient(135deg, ${hex} 0%, ${hex}cc 50%, ${hex}99 100%)`
                             },
                             dark: {
-                                gradient: `linear-gradient(135deg, ${hex}66 0%, ${hex}55 50%, ${hex}44 100%)`
+                                gradient: `linear-gradient(135deg, ${hex}55 0%, ${hex}66 50%, ${hex}77 100%)`
                             }
                         },
                         tokens: {
@@ -2022,30 +2106,13 @@ function getLocalPalette(imageUrl) {
                         }
                     };
                     
-                    console.log('🎨 使用URL哈希生成调色板:', hex);
+                    console.log('✅ 生成调色板成功');
                     resolve(palette);
-                    return;
-                }
-                
-                const data = imageData.data;
-                
-                // 改进的颜色提取：计算平均颜色
-                let r = 0, g = 0, b = 0, count = 0;
-                
-                for (let i = 0; i < data.length; i += 4) {
-                    const alpha = data[i + 3];
-                    if (alpha > 128) { // 只考虑不透明的像素
-                        r += data[i];
-                        g += data[i + 1];
-                        b += data[i + 2];
-                        count++;
-                    }
-                }
-                
-                if (count === 0) {
-                    console.warn('⚠️ 没有找到不透明像素，使用默认调色板');
-                    // 返回默认调色板
-                    const defaultPalette = {
+                } catch (error) {
+                    console.error('❌ 取色处理失败:', error);
+                    
+                    // 返回备用调色板
+                    const fallbackPalette = {
                         gradients: {
                             light: {
                                 gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
@@ -2065,45 +2132,15 @@ function getLocalPalette(imageUrl) {
                             }
                         }
                     };
-                    resolve(defaultPalette);
-                    return;
+                    resolve(fallbackPalette);
+                } finally {
+                    // 清理对象URL以释放内存
+                    URL.revokeObjectURL(objectUrl);
                 }
-                
-                // 计算平均颜色
-                r = Math.round(r / count);
-                g = Math.round(g / count);
-                b = Math.round(b / count);
-                
-                // 创建主题色
-                const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-                console.log('🎨 提取到主题色:', hex);
-                
-                // 创建明显的渐变效果
-                const palette = {
-                    gradients: {
-                        light: {
-                            gradient: `linear-gradient(135deg, ${hex} 0%, ${hex}cc 50%, ${hex}99 100%)`
-                        },
-                        dark: {
-                            gradient: `linear-gradient(135deg, ${hex}55 0%, ${hex}66 50%, ${hex}77 100%)`
-                        }
-                    },
-                    tokens: {
-                        light: {
-                            primaryColor: hex,
-                            primaryColorDark: hex
-                        },
-                        dark: {
-                            primaryColor: hex,
-                            primaryColorDark: hex
-                        }
-                    }
-                };
-                
-                console.log('✅ 生成调色板成功');
-                resolve(palette);
-            } catch (error) {
-                console.error('❌ 取色处理失败:', error);
+            };
+            
+            img.onerror = () => {
+                console.error('❌ 图片加载失败，使用默认调色板');
                 
                 // 返回备用调色板
                 const fallbackPalette = {
@@ -2127,38 +2164,227 @@ function getLocalPalette(imageUrl) {
                     }
                 };
                 resolve(fallbackPalette);
-            }
-        };
-        
-        img.onerror = () => {
-            console.error('❌ 图片加载失败，使用默认调色板');
-            
-            // 返回备用调色板
-            const fallbackPalette = {
-                gradients: {
-                    light: {
-                        gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-                    },
-                    dark: {
-                        gradient: "linear-gradient(135deg, #2c3e50 0%, #34495e 100%)"
-                    }
-                },
-                tokens: {
-                    light: {
-                        primaryColor: "#667eea",
-                        primaryColorDark: "#764ba2"
-                    },
-                    dark: {
-                        primaryColor: "#3498db",
-                        primaryColorDark: "#2980b9"
-                    }
-                }
+                
+                // 清理对象URL以释放内存
+                URL.revokeObjectURL(objectUrl);
             };
-            resolve(fallbackPalette);
-        };
-        
-        img.src = imageUrl;
-        console.log('📡 开始加载图片...');
+            
+            img.src = objectUrl;
+            console.log('📡 开始加载图片...');
+            
+        } catch (fetchError) {
+            console.warn('⚠️ Fetch方式获取图片失败:', fetchError.message, '尝试传统方式');
+            
+            // 如果fetch方式失败，回退到传统的图片加载方式
+            const img = new Image();
+            // 移除crossOrigin属性以避免QQ音乐等跨域图片的CORS问题
+            // img.crossOrigin = "anonymous";
+            
+            img.onload = () => {
+                console.log('✅ 图片加载成功，尺寸:', img.width, 'x', img.height);
+                try {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    
+                    // 调整画布大小，缩小图片以提高性能
+                    const maxSize = 200;
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > height && width > maxSize) {
+                        height = Math.round((height * maxSize) / width);
+                        width = maxSize;
+                    } else if (height > maxSize) {
+                        width = Math.round((width * maxSize) / height);
+                        height = maxSize;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // 绘制图片到画布
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // 获取像素数据
+                    let imageData;
+                    try {
+                        imageData = ctx.getImageData(0, 0, width, height);
+                        console.log('📊 成功获取像素数据，像素数:', imageData.data.length / 4);
+                    } catch (crossOriginError) {
+                        console.warn('❌ 跨域图片无法提取颜色，使用基于URL的颜色生成方案:', crossOriginError.message);
+                        
+                        // 基于URL哈希生成主题色，确保同一图片始终生成相同颜色
+                        const hash = Array.from(imageUrl).reduce((acc, char) => {
+                            acc = ((acc << 5) - acc) + char.charCodeAt(0);
+                            return acc & acc;
+                        }, 0);
+                        
+                        // 使用哈希生成一个一致的主题色
+                        const hue = Math.abs(hash % 360);
+                        const saturation = 60 + Math.abs(hash % 20);
+                        const lightness = 65 + Math.abs(hash % 10);
+
+                        // 创建基于URL的调色板
+                        const hex = `#${((1 << 24) + ((hue * 0.7) << 16) + ((saturation * 2.55) << 8) + (lightness * 2.55)).toString(16).slice(1)}`;
+                        
+                        const palette = {
+                            gradients: {
+                                light: {
+                                    gradient: `linear-gradient(135deg, ${hex} 0%, ${hex}bb 50%, ${hex}99 100%)`
+                                },
+                                dark: {
+                                    gradient: `linear-gradient(135deg, ${hex}66 0%, ${hex}55 50%, ${hex}44 100%)`
+                                }
+                            },
+                            tokens: {
+                                light: {
+                                    primaryColor: hex,
+                                    primaryColorDark: hex
+                                },
+                                dark: {
+                                    primaryColor: hex,
+                                    primaryColorDark: hex
+                                }
+                            }
+                        };
+                        
+                        console.log('🎨 使用URL哈希生成调色板:', hex);
+                        resolve(palette);
+                        return;
+                    }
+                    
+                    const data = imageData.data;
+                    
+                    // 改进的颜色提取：计算平均颜色
+                    let r = 0, g = 0, b = 0, count = 0;
+                    
+                    for (let i = 0; i < data.length; i += 4) {
+                        const alpha = data[i + 3];
+                        if (alpha > 128) { // 只考虑不透明的像素
+                            r += data[i];
+                            g += data[i + 1];
+                            b += data[i + 2];
+                            count++;
+                        }
+                    }
+                    
+                    if (count === 0) {
+                        console.warn('⚠️ 没有找到不透明像素，使用默认调色板');
+                        // 返回默认调色板
+                        const defaultPalette = {
+                            gradients: {
+                                light: {
+                                    gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                                },
+                                dark: {
+                                    gradient: "linear-gradient(135deg, #2c3e50 0%, #34495e 100%)"
+                                }
+                            },
+                            tokens: {
+                                light: {
+                                    primaryColor: "#667eea",
+                                    primaryColorDark: "#764ba2"
+                                },
+                                dark: {
+                                    primaryColor: "#3498db",
+                                    primaryColorDark: "#2980b9"
+                                }
+                            }
+                        };
+                        resolve(defaultPalette);
+                        return;
+                    }
+                    
+                    // 计算平均颜色
+                    r = Math.round(r / count);
+                    g = Math.round(g / count);
+                    b = Math.round(b / count);
+                    
+                    // 创建主题色
+                    const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+                    console.log('🎨 提取到主题色:', hex);
+                    
+                    // 创建明显的渐变效果
+                    const palette = {
+                        gradients: {
+                            light: {
+                                gradient: `linear-gradient(135deg, ${hex} 0%, ${hex}cc 50%, ${hex}99 100%)`
+                            },
+                            dark: {
+                                gradient: `linear-gradient(135deg, ${hex}55 0%, ${hex}66 50%, ${hex}77 100%)`
+                            }
+                        },
+                        tokens: {
+                            light: {
+                                primaryColor: hex,
+                                primaryColorDark: hex
+                            },
+                            dark: {
+                                primaryColor: hex,
+                                primaryColorDark: hex
+                            }
+                        }
+                    };
+                    
+                    console.log('✅ 生成调色板成功');
+                    resolve(palette);
+                } catch (error) {
+                    console.error('❌ 取色处理失败:', error);
+                    
+                    // 返回备用调色板
+                    const fallbackPalette = {
+                        gradients: {
+                            light: {
+                                gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                            },
+                            dark: {
+                                gradient: "linear-gradient(135deg, #2c3e50 0%, #34495e 100%)"
+                            }
+                        },
+                        tokens: {
+                            light: {
+                                primaryColor: "#667eea",
+                                primaryColorDark: "#764ba2"
+                            },
+                            dark: {
+                                primaryColor: "#3498db",
+                                primaryColorDark: "#2980b9"
+                            }
+                        }
+                    };
+                    resolve(fallbackPalette);
+                }
+            
+            img.onerror = () => {
+                console.error('❌ 图片加载失败，使用默认调色板');
+                
+                // 返回备用调色板
+                const fallbackPalette = {
+                    gradients: {
+                        light: {
+                            gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                        },
+                        dark: {
+                            gradient: "linear-gradient(135deg, #2c3e50 0%, #34495e 100%)"
+                        }
+                    },
+                    tokens: {
+                        light: {
+                            primaryColor: "#667eea",
+                            primaryColorDark: "#764ba2"
+                        },
+                        dark: {
+                            primaryColor: "#3498db",
+                            primaryColorDark: "#2980b9"
+                        }
+                    }
+                };
+                resolve(fallbackPalette);
+            };
+            
+            img.src = processedImageUrl;
+            console.log('📡 开始加载图片...');
+        }
     });
 }
 
