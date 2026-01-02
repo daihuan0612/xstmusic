@@ -389,7 +389,7 @@ function createPersistentStorageClient() {
                 remoteAvailable = Boolean(result && result.d1Available);
                 return remoteAvailable;
             } catch (error) {
-                console.warn("检查远程存储可用性失败", error);
+                console.warn("妫€鏌ヨ繙绋嬪瓨鍌ㄥ彲鐢ㄦ€уけ璐?, error);
                 return false;
             }
         })();
@@ -410,7 +410,7 @@ function createPersistentStorageClient() {
             }
             return await response.json();
         } catch (error) {
-            console.warn("获取远程存储数据失败", error);
+            console.warn("鑾峰彇杩滅▼瀛樺偍鏁版嵁澶辫触", error);
             return null;
         }
     };
@@ -428,7 +428,7 @@ function createPersistentStorageClient() {
             });
             return true;
         } catch (error) {
-            console.warn("写入远程存储失败", error);
+            console.warn("鍐欏叆杩滅▼瀛樺偍澶辫触", error);
             return false;
         }
     };
@@ -446,7 +446,7 @@ function createPersistentStorageClient() {
             });
             return true;
         } catch (error) {
-            console.warn("删除远程存储数据失败", error);
+            console.warn("鍒犻櫎杩滅▼瀛樺偍鏁版嵁澶辫触", error);
             return false;
         }
     };
@@ -470,7 +470,7 @@ function persistStorageItems(items) {
         return;
     }
     persistentStorage.setItems(items).catch((error) => {
-        console.warn("同步远程存储失败", error);
+        console.warn("鍚屾杩滅▼瀛樺偍澶辫触", error);
     });
 }
 
@@ -479,7 +479,7 @@ function removePersistentItems(keys = []) {
         return;
     }
     persistentStorage.removeItems(keys).catch((error) => {
-        console.warn("移除远程存储数据失败", error);
+        console.warn("绉婚櫎杩滅▼瀛樺偍鏁版嵁澶辫触", error);
     });
 }
 
@@ -487,7 +487,7 @@ function safeGetLocalStorage(key) {
     try {
         return localStorage.getItem(key);
     } catch (error) {
-        console.warn(`读取本地存储失败: ${key}`, error);
+        console.warn(`璇诲彇鏈湴瀛樺偍澶辫触: ${key}`, error);
         return null;
     }
 }
@@ -497,7 +497,7 @@ function safeSetLocalStorage(key, value, options = {}) {
     try {
         localStorage.setItem(key, value);
     } catch (error) {
-        console.warn(`写入本地存储失败: ${key}`, error);
+        console.warn(`鍐欏叆鏈湴瀛樺偍澶辫触: ${key}`, error);
     }
     if (!skipRemote && remoteSyncEnabled && shouldSyncStorageKey(key)) {
         persistStorageItems({ [key]: value });
@@ -509,7 +509,7 @@ function safeRemoveLocalStorage(key, options = {}) {
     try {
         localStorage.removeItem(key);
     } catch (error) {
-        console.warn(`移除本地存储失败: ${key}`, error);
+        console.warn(`绉婚櫎鏈湴瀛樺偍澶辫触: ${key}`, error);
     }
     if (!skipRemote && remoteSyncEnabled && shouldSyncStorageKey(key)) {
         removePersistentItems([key]);
@@ -522,7 +522,7 @@ function parseJSON(value, fallback) {
         const parsed = JSON.parse(value);
         return parsed;
     } catch (error) {
-        console.warn("解析本地存储 JSON 失败", error);
+        console.warn("瑙ｆ瀽鏈湴瀛樺偍 JSON 澶辫触", error);
         return fallback;
     }
 }
@@ -534,7 +534,7 @@ function cloneSearchResults(results) {
     try {
         return JSON.parse(JSON.stringify(results));
     } catch (error) {
-        console.warn("复制搜索结果失败，回退到浅拷贝", error);
+        console.warn("澶嶅埗鎼滅储缁撴灉澶辫触锛屽洖閫€鍒版祬鎷疯礉", error);
         return results.map((item) => {
             if (item && typeof item === "object") {
                 return { ...item };
@@ -575,7 +575,7 @@ function loadStoredPalettes() {
             }
         }
     } catch (error) {
-        console.warn("解析调色板缓存失败", error);
+        console.warn("瑙ｆ瀽璋冭壊鏉跨紦瀛樺け璐?, error);
     }
 }
 
@@ -585,7 +585,7 @@ function persistPaletteCache() {
     try {
         safeSetLocalStorage(PALETTE_STORAGE_KEY, JSON.stringify(entries));
     } catch (error) {
-        console.warn("保存调色板缓存失败", error);
+        console.warn("淇濆瓨璋冭壊鏉跨紦瀛樺け璐?, error);
     }
 }
 
@@ -625,39 +625,37 @@ function buildAudioProxyUrl(url) {
 
     try {
         const parsedUrl = new URL(url, window.location.href);
-        // 新API返回的URL已经是完整的代理URL，不需要额外处理
-        return parsedUrl.toString();
+        // 鏂癆PI杩斿洖鐨刄RL宸茬粡鏄畬鏁寸殑浠ｇ悊URL锛屼笉闇€瑕侀澶栧鐞?        return parsedUrl.toString();
     } catch (error) {
-        console.warn("无法解析音频地址，跳过代理", error);
+        console.warn("鏃犳硶瑙ｆ瀽闊抽鍦板潃锛岃烦杩囦唬鐞?, error);
         return url;
     }
 }
 
-// 为QQ音乐等特殊源构建图片代理URL
+// 涓篞Q闊充箰绛夌壒娈婃簮鏋勫缓鍥剧墖浠ｇ悊URL
 function buildImageProxyUrl(url) {
     if (!url || typeof url !== "string") return url;
     
-    // 如果URL已经是当前域名下的，不需要代理
-    try {
+    // 濡傛灉URL宸茬粡鏄綋鍓嶅煙鍚嶄笅鐨勶紝涓嶉渶瑕佷唬鐞?    try {
         const parsedUrl = new URL(url, window.location.href);
         if (parsedUrl.origin === window.location.origin) {
             return url;
         }
         
-        // 对于外部图片，尝试通过API代理
+        // 瀵逛簬澶栭儴鍥剧墖锛屽皾璇曢€氳繃API浠ｇ悊
         const proxyUrl = new URL('/api/proxy', window.location.origin);
         proxyUrl.searchParams.set('url', encodeURIComponent(url));
         return proxyUrl.toString();
     } catch (error) {
-        console.warn("无法构建图片代理URL，返回原URL", error);
+        console.warn("鏃犳硶鏋勫缓鍥剧墖浠ｇ悊URL锛岃繑鍥炲師URL", error);
         return url;
     }
 }
 
 const SOURCE_OPTIONS = [
-    { value: "netease", label: "网易云音乐" },
-    // { value: "kuwo", label: "酷我音乐" }, // 酷我音乐功能暂未修复，已禁用
-    { value: "qq", label: "QQ音乐" }
+    { value: "netease", label: "缃戞槗浜戦煶涔? },
+    // { value: "kuwo", label: "閰锋垜闊充箰" }, // 閰锋垜闊充箰鍔熻兘鏆傛湭淇锛屽凡绂佺敤
+    { value: "qq", label: "QQ闊充箰" }
 ];
 
 function normalizeSource(value) {
@@ -666,14 +664,14 @@ function normalizeSource(value) {
 }
 
 const QUALITY_OPTIONS = [
-    { value: "mp3", label: "MP3音质", description: "自动选择" },
-    { value: "999", label: "无损音质", description: "FLAC" },
-    { value: "flac", label: "无损音质", description: "FLAC" },
-    { value: "flac24bit", label: "Hi-Res音质", description: "FLAC24bit" }
+    { value: "mp3", label: "MP3闊宠川", description: "鑷姩閫夋嫨" },
+    { value: "999", label: "鏃犳崯闊宠川", description: "FLAC" },
+    { value: "flac", label: "鏃犳崯闊宠川", description: "FLAC" },
+    { value: "flac24bit", label: "Hi-Res闊宠川", description: "FLAC24bit" }
 ];
 
 function normalizeQuality(value) {
-    // 处理MP3选项，返回默认的MP3质量
+    // 澶勭悊MP3閫夐」锛岃繑鍥為粯璁ょ殑MP3璐ㄩ噺
     if (value === "mp3") {
         return "mp3";
     }
@@ -779,7 +777,7 @@ const savedCurrentPlaylist = (() => {
     return playlists.includes(stored) ? stored : "playlist";
 })();
 
-// API配置 - 符合TuneHub API规范
+// API閰嶇疆 - 绗﹀悎TuneHub API瑙勮寖
 const API = {
     baseUrl: "https://music-dl.sayqz.com",
 
@@ -790,9 +788,9 @@ const API = {
         
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                debugLog(`API请求 (尝试 ${attempt}/${maxRetries}): ${url}`);
+                debugLog(`API璇锋眰 (灏濊瘯 ${attempt}/${maxRetries}): ${url}`);
                 
-                // 添加 timeout 支持
+                // 娣诲姞 timeout 鏀寔
                 const controller = new AbortController();
                 const id = setTimeout(() => controller.abort(), timeout);
                 
@@ -801,12 +799,12 @@ const API = {
                         "Accept": "application/json",
                         ...options.headers,
                     },
-                    mode: 'cors', // 添加 cors 模式支持
+                    mode: 'cors', // 娣诲姞 cors 妯″紡鏀寔
                     signal: controller.signal,
                     ...options,
                 });
                 
-                clearTimeout(id); // 清除 timeout
+                clearTimeout(id); // 娓呴櫎 timeout
 
                 if (!response.ok) {
                     throw new Error(`Request failed with status ${response.status}`);
@@ -814,24 +812,24 @@ const API = {
 
                 const text = await response.text();
                 try {
-                    // 检查响应内容是否为空或无效
+                    // 妫€鏌ュ搷搴斿唴瀹规槸鍚︿负绌烘垨鏃犳晥
                     if (!text || text.trim().length === 0) {
-                        console.warn("响应内容为空，返回null");
+                        console.warn("鍝嶅簲鍐呭涓虹┖锛岃繑鍥瀗ull");
                         return null;
                     }
                     return JSON.parse(text);
                 } catch (parseError) {
                     console.warn("JSON parse failed, returning raw text", parseError);
-                    // 对于非JSON响应（如音频文件），直接返回原始文本
+                    // 瀵逛簬闈濲SON鍝嶅簲锛堝闊抽鏂囦欢锛夛紝鐩存帴杩斿洖鍘熷鏂囨湰
                     return text;
                 }
             } catch (error) {
-                debugLog(`API请求失败 (尝试 ${attempt}/${maxRetries}): ${error.message}`);
+                debugLog(`API璇锋眰澶辫触 (灏濊瘯 ${attempt}/${maxRetries}): ${error.message}`);
                 if (attempt < maxRetries) {
-                    debugLog(`等待 ${retryDelay}ms 后重试...`);
+                    debugLog(`绛夊緟 ${retryDelay}ms 鍚庨噸璇?..`);
                     await new Promise(resolve => setTimeout(resolve, retryDelay));
                 } else {
-                    console.error("API请求最终失败:", error);
+                    console.error("API璇锋眰鏈€缁堝け璐?", error);
                     throw error;
                 }
             }
@@ -842,12 +840,12 @@ const API = {
         const url = `${API.baseUrl}/api/?source=${source}&type=search&keyword=${encodeURIComponent(keyword)}&limit=${count}`;
 
         try {
-            debugLog(`API请求: ${url}`);
+            debugLog(`API璇锋眰: ${url}`);
             const data = await API.fetchJson(url);
-            debugLog(`API响应: ${JSON.stringify(data).substring(0, 200)}...`);
+            debugLog(`API鍝嶅簲: ${JSON.stringify(data).substring(0, 200)}...`);
 
             if (!data || data.code !== 200 || !Array.isArray(data.data.results)) {
-                throw new Error("搜索结果格式错误");
+                throw new Error("鎼滅储缁撴灉鏍煎紡閿欒");
             }
 
             return data.data.results.map(song => ({
@@ -856,13 +854,13 @@ const API = {
                 artist: song.artist,
                 album: song.album,
                 source: song.platform || source,
-                // 新API返回的URL已经是完整的API链接，我们需要提取id用于后续请求
+                // 鏂癆PI杩斿洖鐨刄RL宸茬粡鏄畬鏁寸殑API閾炬帴锛屾垜浠渶瑕佹彁鍙杋d鐢ㄤ簬鍚庣画璇锋眰
                 pic_id: song.id,
                 url_id: song.id,
                 lyric_id: song.id,
             }));
         } catch (error) {
-            debugLog(`API错误: ${error.message}`);
+            debugLog(`API閿欒: ${error.message}`);
             throw error;
         }
     },
@@ -894,33 +892,32 @@ const API = {
     },
 
     getSongUrl: (song, quality = "320") => {
-        console.log('🎵 getSongUrl调用:', song, '质量:', quality);
+        console.log('馃幍 getSongUrl璋冪敤:', song, '璐ㄩ噺:', quality);
         
-        // 根据API文档，quality参数需要映射为128k, 192k, 320k, flac, flac24bit
+        // 鏍规嵁API鏂囨。锛宷uality鍙傛暟闇€瑕佹槧灏勪负128k, 192k, 320k, flac, flac24bit
         const qualityMap = {
             "128": "128k",
             "192": "192k",
             "320": "320k",
             "999": "flac",
-            "flac": "flac", // 添加flac到qualityMap，确保flac质量参数能正确映射
-            "flac24bit": "flac24bit" // 添加flac24bit支持
+            "flac": "flac", // 娣诲姞flac鍒皅ualityMap锛岀‘淇漟lac璐ㄩ噺鍙傛暟鑳芥纭槧灏?            "flac24bit": "flac24bit" // 娣诲姞flac24bit鏀寔
         };
         
-        // 处理MP3选项，返回默认的MP3质量
+        // 澶勭悊MP3閫夐」锛岃繑鍥為粯璁ょ殑MP3璐ㄩ噺
         if (quality === "mp3") {
             quality = "320";
         }
         
-        // 确保使用有效的音质映射，支持192k和flac
-        console.log('📊 qualityMap:', qualityMap, 'quality:', quality, 'quality in qualityMap:', quality in qualityMap);
+        // 纭繚浣跨敤鏈夋晥鐨勯煶璐ㄦ槧灏勶紝鏀寔192k鍜宖lac
+        console.log('馃搳 qualityMap:', qualityMap, 'quality:', quality, 'quality in qualityMap:', quality in qualityMap);
         const validQuality = quality in qualityMap ? quality : "320";
         const br = qualityMap[validQuality];
         
-        console.log('🔄 质量映射:', quality, '->', validQuality, '->', br);
+        console.log('馃攧 璐ㄩ噺鏄犲皠:', quality, '->', validQuality, '->', br);
         
-        // 构建API URL，支持不同类型的请求
+        // 鏋勫缓API URL锛屾敮鎸佷笉鍚岀被鍨嬬殑璇锋眰
         const url = `${API.baseUrl}/api/?source=${song.source || "netease"}&id=${song.id}&type=url&br=${br}`;
-        console.log('🌐 生成的URL:', url);
+        console.log('馃寪 鐢熸垚鐨刄RL:', url);
         return url;
     },
 
@@ -939,9 +936,9 @@ const API = {
             if (data && data.code === 200) {
                 return data.data;
             }
-            throw new Error("获取歌曲信息失败");
+            throw new Error("鑾峰彇姝屾洸淇℃伅澶辫触");
         } catch (error) {
-            console.error("获取歌曲信息错误:", error);
+            console.error("鑾峰彇姝屾洸淇℃伅閿欒:", error);
             throw error;
         }
     }
@@ -950,22 +947,21 @@ const API = {
 Object.freeze(API);
 
 // ================================================
-// 辅助检测函数
-// ================================================
+// 杈呭姪妫€娴嬪嚱鏁?// ================================================
 
-// 检测是否为 iOS PWA 独立运行模式
+// 妫€娴嬫槸鍚︿负 iOS PWA 鐙珛杩愯妯″紡
 const isIOSPWA = () => {
-    // 方法1：iOS Safari 的 navigator.standalone
+    // 鏂规硶1锛歩OS Safari 鐨?navigator.standalone
     if (window.navigator.standalone === true) {
         return true;
     }
     
-    // 方法2：标准的 display-mode: standalone
+    // 鏂规硶2锛氭爣鍑嗙殑 display-mode: standalone
     if (window.matchMedia('(display-mode: standalone)').matches) {
         return true;
     }
     
-    // 方法3：检查用户代理 + 全屏模式
+    // 鏂规硶3锛氭鏌ョ敤鎴蜂唬鐞?+ 鍏ㄥ睆妯″紡
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     if (isIOS && (
         window.matchMedia('(display-mode: fullscreen)').matches ||
@@ -977,26 +973,23 @@ const isIOSPWA = () => {
     return false;
 };
 
-// 检测是否锁屏/后台
+// 妫€娴嬫槸鍚﹂攣灞?鍚庡彴
 const isLockScreen = () => document.visibilityState === 'hidden';
 
-// 判断是否应该使用隐身模式
+// 鍒ゆ柇鏄惁搴旇浣跨敤闅愯韩妯″紡
 const shouldUseStealthMode = () => isIOSPWA() && isLockScreen();
 
-// 获取封面图片列表（用于锁屏控制台）
-function getArtworkListForLockScreen(song) {
-    // 确保使用有效的封面URL，优先顺序：
-    // 1. 当前已加载的封面
-    // 2. 从歌曲信息获取的封面
-    // 3. 应用图标（确保使用绝对路径，避免404）
-    let artworkUrl = state.currentArtworkUrl;
+// 鑾峰彇灏侀潰鍥剧墖鍒楄〃锛堢敤浜庨攣灞忔帶鍒跺彴锛?function getArtworkListForLockScreen(song) {
+    // 纭繚浣跨敤鏈夋晥鐨勫皝闈RL锛屼紭鍏堥『搴忥細
+    // 1. 褰撳墠宸插姞杞界殑灏侀潰
+    // 2. 浠庢瓕鏇蹭俊鎭幏鍙栫殑灏侀潰
+    // 3. 搴旂敤鍥炬爣锛堢‘淇濅娇鐢ㄧ粷瀵硅矾寰勶紝閬垮厤404锛?    let artworkUrl = state.currentArtworkUrl;
     if (!artworkUrl && song.pic_id) {
         artworkUrl = API.getPicUrl(song);
     }
-    // 使用一个可靠的默认图标，确保它存在
+    // 浣跨敤涓€涓彲闈犵殑榛樿鍥炬爣锛岀‘淇濆畠瀛樺湪
     if (!artworkUrl) {
-        // 尝试使用favicon，确保使用绝对路径
-        artworkUrl = window.location.origin + '/favicon.png';
+        // 灏濊瘯浣跨敤favicon锛岀‘淇濅娇鐢ㄧ粷瀵硅矾寰?        artworkUrl = window.location.origin + '/favicon.png';
     }
     
     return [
@@ -1017,19 +1010,16 @@ const state = {
     currentLyricLine: -1,
     currentPlaylist: savedCurrentPlaylist, // 'online', 'search', or 'playlist'
     searchPage: savedLastSearchState?.page || 1,
-    searchKeyword: savedLastSearchState?.keyword || "", // 确保这里有初始值
-    searchSource: savedLastSearchState ? savedLastSearchState.source : savedSearchSource,
+    searchKeyword: savedLastSearchState?.keyword || "", // 纭繚杩欓噷鏈夊垵濮嬪€?    searchSource: savedLastSearchState ? savedLastSearchState.source : savedSearchSource,
     hasMoreResults: typeof savedLastSearchState?.hasMore === "boolean" ? savedLastSearchState.hasMore : true,
     currentSong: savedCurrentSong,
     currentArtworkUrl: null,
     debugMode: false,
-    isSearchMode: false, // 新增：搜索模式状态
-    playlistSongs: savedPlaylistSongs, // 新增：统一播放列表
-    playMode: savedPlayMode, // 新增：播放模式 'list', 'single', 'random'
+    isSearchMode: false, // 鏂板锛氭悳绱㈡ā寮忕姸鎬?    playlistSongs: savedPlaylistSongs, // 鏂板锛氱粺涓€鎾斁鍒楄〃
+    playMode: savedPlayMode, // 鏂板锛氭挱鏀炬ā寮?'list', 'single', 'random'
     playlistLastNonRandomMode: savedPlayMode === "random" ? "list" : savedPlayMode,
     favoriteSongs: savedFavoriteSongs,
-    isPlaying: false, // 新增：播放状态标志
-    currentFavoriteIndex: savedCurrentFavoriteIndex,
+    isPlaying: false, // 鏂板锛氭挱鏀剧姸鎬佹爣蹇?    currentFavoriteIndex: savedCurrentFavoriteIndex,
     currentList: savedCurrentList,
     favoritePlayMode: savedFavoritePlayMode,
     favoriteLastNonRandomMode: savedFavoritePlayMode === "random" ? "list" : savedFavoritePlayMode,
@@ -1043,9 +1033,7 @@ const state = {
     isSeeking: false,
     qualityMenuOpen: false,
     sourceMenuOpen: false,
-    userScrolledLyrics: false, // 新增：用户是否手动滚动歌词
-    lyricsScrollTimeout: null, // 新增：歌词滚动超时
-    themeDefaultsCaptured: false,
+    userScrolledLyrics: false, // 鏂板锛氱敤鎴锋槸鍚︽墜鍔ㄦ粴鍔ㄦ瓕璇?    lyricsScrollTimeout: null, // 鏂板锛氭瓕璇嶆粴鍔ㄨ秴鏃?    themeDefaultsCaptured: false,
     dynamicPalette: null,
     currentPaletteImage: null,
     pendingPaletteData: null,
@@ -1056,9 +1044,9 @@ const state = {
     currentGradient: '',
     isMobileInlineLyricsOpen: false,
     selectedSearchResults: new Set(),
-    needUpdateOnUnlock: false, // 新增：iOS PWA 解锁后是否需要更新UI
-    pendingStealthUpdate: null, // 新增：隐身模式下待更新的信息
-    forceUIUpdate: false, // 新增：强制UI更新标志
+    needUpdateOnUnlock: false, // 鏂板锛歩OS PWA 瑙ｉ攣鍚庢槸鍚﹂渶瑕佹洿鏂癠I
+    pendingStealthUpdate: null, // 鏂板锛氶殣韬ā寮忎笅寰呮洿鏂扮殑淇℃伅
+    forceUIUpdate: false, // 鏂板锛氬己鍒禪I鏇存柊鏍囧織
 };
 
 let importSelectedMenuOutsideHandler = null;
@@ -1080,8 +1068,8 @@ if (!Array.isArray(state.favoriteSongs) || state.favoriteSongs.length === 0) {
 saveFavoriteState();
 
 async function bootstrapPersistentStorage() {
-    // 禁用远程存储同步，确保每个设备的播放列表独立
-    // 注释掉远程存储加载和同步启用代码
+    // 绂佺敤杩滅▼瀛樺偍鍚屾锛岀‘淇濇瘡涓澶囩殑鎾斁鍒楄〃鐙珛
+    // 娉ㄩ噴鎺夎繙绋嬪瓨鍌ㄥ姞杞藉拰鍚屾鍚敤浠ｇ爜
     /*
     try {
         const remoteKeys = Array.from(STORAGE_KEYS_TO_SYNC);
@@ -1091,7 +1079,7 @@ async function bootstrapPersistentStorage() {
         }
         applyPersistentSnapshotFromRemote(snapshot.data);
     } catch (error) {
-        console.warn("加载远程存储失败", error);
+        console.warn("鍔犺浇杩滅▼瀛樺偍澶辫触", error);
     } finally {
         remoteSyncEnabled = true;
     }
@@ -1250,7 +1238,7 @@ function applyPersistentSnapshotFromRemote(data) {
             state.currentSong = restoredSong;
             updatePlaylistHighlight();
             updateCurrentSongInfo(restoredSong, { updateBackground: true }).catch((error) => {
-                console.error("恢复远程歌曲信息失败:", error);
+                console.error("鎭㈠杩滅▼姝屾洸淇℃伅澶辫触:", error);
             });
         }
     } else if (dom.playlist) {
@@ -1296,7 +1284,7 @@ bootstrapPersistentStorage();
                 window.__SOLARA_UPDATE_MEDIA_METADATA();
                 refreshed = true;
             } catch (error) {
-                console.warn('刷新媒体信息失败:', error);
+                console.warn('鍒锋柊濯掍綋淇℃伅澶辫触:', error);
             }
         }
         if (!refreshed) {
@@ -1329,10 +1317,10 @@ bootstrapPersistentStorage();
     }
 
     function getArtworkList(url) {
-        // iOS/Safari 建议多尺寸封面；你的 API 已有 pic_id -> pic url（300），这里做兜底多尺寸
-        // 注意：尽量提供 https 链接；你的项目里已有 preferHttpsUrl/buildAudioProxyUrl 工具函数
+        // iOS/Safari 寤鸿澶氬昂瀵稿皝闈紱浣犵殑 API 宸叉湁 pic_id -> pic url锛?00锛夛紝杩欓噷鍋氬厹搴曞灏哄
+        // 娉ㄦ剰锛氬敖閲忔彁渚?https 閾炬帴锛涗綘鐨勯」鐩噷宸叉湁 preferHttpsUrl/buildAudioProxyUrl 宸ュ叿鍑芥暟
         const src = (typeof preferHttpsUrl === 'function') ? preferHttpsUrl(url) : (url || '');
-        // 如果没有封面，用默认封面兜底
+        // 濡傛灉娌℃湁灏侀潰锛岀敤榛樿灏侀潰鍏滃簳
         const fallback = '/favicon.png';
         const baseSrc = src || fallback;
         const base = toAbsoluteUrl(baseSrc);
@@ -1350,7 +1338,7 @@ bootstrapPersistentStorage();
     }
 
     function updateMediaMetadata() {
-        // 依赖现有全局 state.currentSong；已在项目中使用 localStorage 保存/恢复。:contentReference[oaicite:7]{index=7}
+        // 渚濊禆鐜版湁鍏ㄥ眬 state.currentSong锛涘凡鍦ㄩ」鐩腑浣跨敤 localStorage 淇濆瓨/鎭㈠銆?contentReference[oaicite:7]{index=7}
         const song = state.currentSong || {};
         const title = song.name || dom.currentSongTitle?.textContent || 'Solara';
         const artist = song.artist || dom.currentSongArtist?.textContent || '';
@@ -1364,16 +1352,14 @@ bootstrapPersistentStorage();
                 artwork: getArtworkList(artworkUrl)
             });
         } catch (e) {
-            // 某些旧 iOS 可能对 artwork 尺寸挑剔，失败时用最小配置重试
-            try {
+            // 鏌愪簺鏃?iOS 鍙兘瀵?artwork 灏哄鎸戝墧锛屽け璐ユ椂鐢ㄦ渶灏忛厤缃噸璇?            try {
                 navigator.mediaSession.metadata = new MediaMetadata({ title, artist });
             } catch (_) {}
         }
     }
 
     function updatePositionState() {
-        // iOS 15+ 支持 setPositionState；用于让锁屏进度条可拖动与显示
-        if (!allowLockScreenScrubbing) return;
+        // iOS 15+ 鏀寔 setPositionState锛涚敤浜庤閿佸睆杩涘害鏉″彲鎷栧姩涓庢樉绀?        if (!allowLockScreenScrubbing) return;
         const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
         const position = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
         const playbackRate = Number.isFinite(audio.playbackRate) ? audio.playbackRate : 1;
@@ -1402,34 +1388,34 @@ bootstrapPersistentStorage();
         if (handlersBound) return;
         handlersBound = true;
 
-        // 播放/暂停交给 <audio> 默认行为即可
+        // 鎾斁/鏆傚仠浜ょ粰 <audio> 榛樿琛屼负鍗冲彲
         try {
             navigator.mediaSession.setActionHandler('previoustrack', async () => {
-                // 直接复用你已有的全局函数（HTML 里也在用）:contentReference[oaicite:9]{index=9}
+                // 鐩存帴澶嶇敤浣犲凡鏈夌殑鍏ㄥ眬鍑芥暟锛圚TML 閲屼篃鍦ㄧ敤锛?contentReference[oaicite:9]{index=9}
                 if (typeof window.playPrevious === 'function') {
                     try {
-                        // 调用playPrevious并等待可能的异步操作完成
+                        // 璋冪敤playPrevious骞剁瓑寰呭彲鑳界殑寮傛鎿嶄綔瀹屾垚
                         const result = window.playPrevious();
                         if (result && typeof result.then === 'function') {
                             await result;
                         }
                         triggerMediaSessionMetadataRefresh();
                     } catch (error) {
-                        console.error('上一曲播放失败:', error);
+                        console.error('涓婁竴鏇叉挱鏀惧け璐?', error);
                     }
                 }
             });
             navigator.mediaSession.setActionHandler('nexttrack', async () => {
                 if (typeof window.playNext === 'function') {
                     try {
-                        // 调用playNext并等待可能的异步操作完成
+                        // 璋冪敤playNext骞剁瓑寰呭彲鑳界殑寮傛鎿嶄綔瀹屾垚
                         const result = window.playNext();
                         if (result && typeof result.then === 'function') {
                             await result;
                         }
                         triggerMediaSessionMetadataRefresh();
                     } catch (error) {
-                        console.error('下一曲播放失败:', error);
+                        console.error('涓嬩竴鏇叉挱鏀惧け璐?', error);
                     }
                 }
             });
@@ -1438,8 +1424,7 @@ bootstrapPersistentStorage();
             navigator.mediaSession.setActionHandler('seekforward', null);
 
             if (allowLockScreenScrubbing) {
-                // 关键：让锁屏支持拖动进度到任意位置
-                navigator.mediaSession.setActionHandler('seekto', (e) => {
+                // 鍏抽敭锛氳閿佸睆鏀寔鎷栧姩杩涘害鍒颁换鎰忎綅缃?                navigator.mediaSession.setActionHandler('seekto', (e) => {
                     if (!e || typeof e.seekTime !== 'number') return;
                     audio.currentTime = Math.max(0, Math.min(audio.duration || 0, e.seekTime));
                     if (e.fastSeek && typeof audio.fastSeek === 'function') {
@@ -1453,17 +1438,15 @@ bootstrapPersistentStorage();
                 } catch (_) {}
             }
 
-            // 可选：切换播放状态（大部分系统自己会处理）
-            navigator.mediaSession.setActionHandler('play', async () => {
+            // 鍙€夛細鍒囨崲鎾斁鐘舵€侊紙澶ч儴鍒嗙郴缁熻嚜宸变細澶勭悊锛?            navigator.mediaSession.setActionHandler('play', async () => {
                 try { await audio.play(); } catch(_) {}
             });
             navigator.mediaSession.setActionHandler('pause', () => audio.pause());
         } catch (_) {
-            // 某些平台不支持全部动作
-        }
+            // 鏌愪簺骞冲彴涓嶆敮鎸佸叏閮ㄥ姩浣?        }
     }
 
-    // 监听 audio 事件，同步锁屏信息与进度
+    // 鐩戝惉 audio 浜嬩欢锛屽悓姝ラ攣灞忎俊鎭笌杩涘害
     audio.addEventListener('loadedmetadata', () => {
         triggerMediaSessionMetadataRefresh();
         updatePositionState();
@@ -1497,8 +1480,7 @@ bootstrapPersistentStorage();
     audio.addEventListener('seeked', updatePositionState);
 
     audio.addEventListener('ended', () => {
-        // 不要立即设置为paused，先尝试自动播放下一首
-        updatePositionState();
+        // 涓嶈绔嬪嵆璁剧疆涓簆aused锛屽厛灏濊瘯鑷姩鎾斁涓嬩竴棣?        updatePositionState();
         const refresh = () => {
             triggerMediaSessionMetadataRefresh();
             audio[MEDIA_SESSION_ENDED_FLAG] = false;
@@ -1506,11 +1488,9 @@ bootstrapPersistentStorage();
         if (typeof autoPlayNext === 'function') {
             try {
                 audio[MEDIA_SESSION_ENDED_FLAG] = 'handling';
-                // 使用异步方式处理，确保媒体会话保持活跃
-                (async () => {
+                // 浣跨敤寮傛鏂瑰紡澶勭悊锛岀‘淇濆獟浣撲細璇濅繚鎸佹椿璺?                (async () => {
                     await autoPlayNext();
-                    // 播放成功后更新媒体会话状态
-                    if (navigator.mediaSession && !audio.paused) {
+                    // 鎾斁鎴愬姛鍚庢洿鏂板獟浣撲細璇濈姸鎬?                    if (navigator.mediaSession && !audio.paused) {
                         navigator.mediaSession.playbackState = 'playing';
                     }
                     audio[MEDIA_SESSION_ENDED_FLAG] = 'skip';
@@ -1518,8 +1498,8 @@ bootstrapPersistentStorage();
                 })();
                 return;
             } catch (error) {
-                console.warn('自动播放下一首失败:', error);
-                // 只有在失败时才设置为paused
+                console.warn('鑷姩鎾斁涓嬩竴棣栧け璐?', error);
+                // 鍙湁鍦ㄥけ璐ユ椂鎵嶈缃负paused
                 if (navigator.mediaSession) {
                     navigator.mediaSession.playbackState = 'paused';
                 }
@@ -1528,7 +1508,7 @@ bootstrapPersistentStorage();
         audio[MEDIA_SESSION_ENDED_FLAG] = 'skip';
         if (typeof window.playNext === 'function') {
             try {
-                // 使用异步方式处理
+                // 浣跨敤寮傛鏂瑰紡澶勭悊
                 (async () => {
                     const result = window.playNext();
                     if (typeof updatePlayPauseButton === 'function') {
@@ -1537,32 +1517,30 @@ bootstrapPersistentStorage();
                     if (result && typeof result.then === 'function') {
                         await result;
                     }
-                    // 播放成功后更新媒体会话状态
-                    if (navigator.mediaSession && !audio.paused) {
+                    // 鎾斁鎴愬姛鍚庢洿鏂板獟浣撲細璇濈姸鎬?                    if (navigator.mediaSession && !audio.paused) {
                         navigator.mediaSession.playbackState = 'playing';
                     }
                     refresh();
                 })();
                 return;
             } catch (error) {
-                console.warn('自动播放下一首失败:', error);
-                // 只有在失败时才设置为paused
+                console.warn('鑷姩鎾斁涓嬩竴棣栧け璐?', error);
+                // 鍙湁鍦ㄥけ璐ユ椂鎵嶈缃负paused
                 if (navigator.mediaSession) {
                     navigator.mediaSession.playbackState = 'paused';
                 }
             }
         }
-        // 只有在没有下一首可播放时才设置为paused
+        // 鍙湁鍦ㄦ病鏈変笅涓€棣栧彲鎾斁鏃舵墠璁剧疆涓簆aused
         if (navigator.mediaSession) {
             navigator.mediaSession.playbackState = 'paused';
         }
         refresh();
     });
 
-    // 当你在应用内切歌（更新 state.currentSong / 封面 / 标题）时，也调用一次：
+    // 褰撲綘鍦ㄥ簲鐢ㄥ唴鍒囨瓕锛堟洿鏂?state.currentSong / 灏侀潰 / 鏍囬锛夋椂锛屼篃璋冪敤涓€娆★細
     // window.__SOLARA_UPDATE_MEDIA_METADATA = updateMediaMetadata;
-    // 这样在你现有的切歌逻辑里，设置完新的 audio.src 后手动调用它可立即更新锁屏封面/文案。
-    if (typeof window.__SOLARA_UPDATE_MEDIA_METADATA !== 'function') {
+    // 杩欐牱鍦ㄤ綘鐜版湁鐨勫垏姝岄€昏緫閲岋紝璁剧疆瀹屾柊鐨?audio.src 鍚庢墜鍔ㄨ皟鐢ㄥ畠鍙珛鍗虫洿鏂伴攣灞忓皝闈?鏂囨銆?    if (typeof window.__SOLARA_UPDATE_MEDIA_METADATA !== 'function') {
         window.__SOLARA_UPDATE_MEDIA_METADATA = updateMediaMetadata;
     }
 
@@ -1697,7 +1675,7 @@ if (state.currentGradient) {
 }
 
 function captureThemeDefaults() {
-    // 总是更新主题默认值，确保CSS修改后能及时反映
+    // 鎬绘槸鏇存柊涓婚榛樿鍊硷紝纭繚CSS淇敼鍚庤兘鍙婃椂鍙嶆槧
     const initialIsDark = document.body.classList.contains("dark-mode");
     document.body.classList.remove("dark-mode");
     const lightStyles = getComputedStyle(document.body);
@@ -1733,8 +1711,7 @@ function setDocumentGradient(gradient, { immediate = false } = {}) {
     const current = (state.currentGradient || "").trim();
     const shouldSkipTransition = immediate || normalized === current;
     
-    // 获取默认渐变值，确保不会移除必要的背景渐变
-    const isDark = document.body.classList.contains("dark-mode");
+    // 鑾峰彇榛樿娓愬彉鍊硷紝纭繚涓嶄細绉婚櫎蹇呰鐨勮儗鏅笎鍙?    const isDark = document.body.classList.contains("dark-mode");
     const defaults = themeDefaults[isDark ? "dark" : "light"];
     const fallbackGradient = defaults.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
     const finalGradient = normalized || fallbackGradient;
@@ -1770,7 +1747,7 @@ function setDocumentGradient(gradient, { immediate = false } = {}) {
 }
 
 function applyDynamicGradient(options = {}) {
-    // 每次调用都更新主题默认值，确保CSS修改后能及时反映
+    // 姣忔璋冪敤閮芥洿鏂颁富棰橀粯璁ゅ€硷紝纭繚CSS淇敼鍚庤兘鍙婃椂鍙嶆槧
     captureThemeDefaults();
     const isDark = document.body.classList.contains("dark-mode");
     const mode = isDark ? "dark" : "light";
@@ -1955,9 +1932,9 @@ function showAlbumCoverPlaceholder() {
 function setAlbumCoverImage(url) {
     const safeUrl = toAbsoluteUrl(preferHttpsUrl(url));
     state.currentArtworkUrl = safeUrl;
-    // 移除crossorigin属性，因为有些服务器可能不支持CORS
-    // 保留referrerpolicy="no-referrer"以保护隐私并解决某些跨域问题
-    dom.albumCover.innerHTML = `<img src="${safeUrl}" alt="专辑封面" referrerpolicy="no-referrer">`;
+    // 绉婚櫎crossorigin灞炴€э紝鍥犱负鏈変簺鏈嶅姟鍣ㄥ彲鑳戒笉鏀寔CORS
+    // 淇濈暀referrerpolicy="no-referrer"浠ヤ繚鎶ら殣绉佸苟瑙ｅ喅鏌愪簺璺ㄥ煙闂
+    dom.albumCover.innerHTML = `<img src="${safeUrl}" alt="涓撹緫灏侀潰" referrerpolicy="no-referrer">`;
     dom.albumCover.classList.remove("loading");
     if (typeof window.__SOLARA_UPDATE_MEDIA_METADATA === 'function') {
         window.__SOLARA_UPDATE_MEDIA_METADATA();
@@ -1966,51 +1943,53 @@ function setAlbumCoverImage(url) {
 
 loadStoredPalettes();
 
-// 本地取色逻辑：使用 Canvas API 从图片中提取颜色
+// 鏈湴鍙栬壊閫昏緫锛氫娇鐢?Canvas API 浠庡浘鐗囦腑鎻愬彇棰滆壊
 function getLocalPalette(imageUrl) {
     return new Promise(async (resolve, reject) => {
-        console.log('🎨 开始本地取色，图片URL:', imageUrl);
+        // 纭繚鍗充娇鍑虹幇鏈崟鑾风殑寮傚父涔熻繑鍥為粯璁よ皟鑹叉澘
+        try {
+        console.log('馃帹 寮€濮嬫湰鍦板彇鑹诧紝鍥剧墖URL:', imageUrl);
         
-        // 针对QQ音乐、网易云音乐等特殊域名，尝试通过代理获取图片
+        // 閽堝QQ闊充箰銆佺綉鏄撲簯闊充箰绛夌壒娈婂煙鍚嶏紝灏濊瘯閫氳繃浠ｇ悊鑾峰彇鍥剧墖
         const isQQMusic = imageUrl.includes('qq.com') || imageUrl.includes('y.qq.com');
         const isNeteaseMusic = imageUrl.includes('music.163.com') || imageUrl.includes('126.net') || imageUrl.includes('netease.com');
         
         let processedImageUrl = imageUrl;
         
-        // 如果是QQ音乐或网易云音乐的图片，尝试通过图片代理获取
+        // 濡傛灉鏄疩Q闊充箰鎴栫綉鏄撲簯闊充箰鐨勫浘鐗囷紝灏濊瘯閫氳繃鍥剧墖浠ｇ悊鑾峰彇
         if (isQQMusic || isNeteaseMusic) {
-            console.log(isQQMusic ? '🎵 检测到QQ音乐图片，尝试通过图片代理获取' : '🎵 检测到网易云音乐图片，尝试通过图片代理获取');
+            console.log(isQQMusic ? '馃幍 妫€娴嬪埌QQ闊充箰鍥剧墖锛屽皾璇曢€氳繃鍥剧墖浠ｇ悊鑾峰彇' : '馃幍 妫€娴嬪埌缃戞槗浜戦煶涔愬浘鐗囷紝灏濊瘯閫氳繃鍥剧墖浠ｇ悊鑾峰彇');
             try {
-                // 尝试使用图片代理函数
+                // 灏濊瘯浣跨敤鍥剧墖浠ｇ悊鍑芥暟
                 processedImageUrl = buildImageProxyUrl(imageUrl);
-                console.log('🔗 使用代理URL:', processedImageUrl);
+                console.log('馃敆 浣跨敤浠ｇ悊URL:', processedImageUrl);
             } catch (proxyError) {
-                console.warn('⚠️ 图片代理获取失败，回退到原URL:', proxyError.message);
+                console.warn('鈿狅笍 鍥剧墖浠ｇ悊鑾峰彇澶辫触锛屽洖閫€鍒板師URL:', proxyError.message);
                 processedImageUrl = imageUrl;
             }
         }
         
-        // 尝试使用fetch方式获取图片，以绕过跨域限制
+        // 灏濊瘯浣跨敤fetch鏂瑰紡鑾峰彇鍥剧墖锛屼互缁曡繃璺ㄥ煙闄愬埗
         try {
             const response = await fetch(processedImageUrl);
             if (!response.ok) {
-                throw new Error(`图片获取失败: ${response.status} ${response.statusText}`);
+                throw new Error(`鍥剧墖鑾峰彇澶辫触: ${response.status} ${response.statusText}`);
             }
             
             const blob = await response.blob();
             
-            // 创建一个对象URL来从blob加载图片
+            // 鍒涘缓涓€涓璞RL鏉ヤ粠blob鍔犺浇鍥剧墖
             const objectUrl = URL.createObjectURL(blob);
             
             const img = new Image();
             
             img.onload = () => {
-                console.log('✅ 图片加载成功，尺寸:', img.width, 'x', img.height);
+                console.log('鉁?鍥剧墖鍔犺浇鎴愬姛锛屽昂瀵?', img.width, 'x', img.height);
                 try {
                     const canvas = document.createElement("canvas");
                     const ctx = canvas.getContext("2d");
                     
-                    // 调整画布大小，缩小图片以提高性能
+                    // 璋冩暣鐢诲竷澶у皬锛岀缉灏忓浘鐗囦互鎻愰珮鎬ц兘
                     const maxSize = 200;
                     let width = img.width;
                     let height = img.height;
@@ -2026,22 +2005,20 @@ function getLocalPalette(imageUrl) {
                     canvas.width = width;
                     canvas.height = height;
                     
-                    // 绘制图片到画布
-                    ctx.drawImage(img, 0, 0, width, height);
+                    // 缁樺埗鍥剧墖鍒扮敾甯?                    ctx.drawImage(img, 0, 0, width, height);
                     
-                    // 获取像素数据
+                    // 鑾峰彇鍍忕礌鏁版嵁
                     const imageData = ctx.getImageData(0, 0, width, height);
-                    console.log('📊 成功获取像素数据，像素数:', imageData.data.length / 4);
+                    console.log('馃搳 鎴愬姛鑾峰彇鍍忕礌鏁版嵁锛屽儚绱犳暟:', imageData.data.length / 4);
                     
                     const data = imageData.data;
                     
-                    // 改进的颜色提取：计算平均颜色
+                    // 鏀硅繘鐨勯鑹叉彁鍙栵細璁＄畻骞冲潎棰滆壊
                     let r = 0, g = 0, b = 0, count = 0;
                     
                     for (let i = 0; i < data.length; i += 4) {
                         const alpha = data[i + 3];
-                        if (alpha > 128) { // 只考虑不透明的像素
-                            r += data[i];
+                        if (alpha > 128) { // 鍙€冭檻涓嶉€忔槑鐨勫儚绱?                            r += data[i];
                             g += data[i + 1];
                             b += data[i + 2];
                             count++;
@@ -2049,9 +2026,8 @@ function getLocalPalette(imageUrl) {
                     }
                     
                     if (count === 0) {
-                        console.warn('⚠️ 没有找到不透明像素，使用默认调色板');
-                        // 返回默认调色板
-                        const defaultPalette = {
+                        console.warn('鈿狅笍 娌℃湁鎵惧埌涓嶉€忔槑鍍忕礌锛屼娇鐢ㄩ粯璁よ皟鑹叉澘');
+                        // 杩斿洖榛樿璋冭壊鏉?                        const defaultPalette = {
                             gradients: {
                                 light: {
                                     gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
@@ -2075,17 +2051,15 @@ function getLocalPalette(imageUrl) {
                         return;
                     }
                     
-                    // 计算平均颜色
+                    // 璁＄畻骞冲潎棰滆壊
                     r = Math.round(r / count);
                     g = Math.round(g / count);
                     b = Math.round(b / count);
                     
-                    // 创建主题色
-                    const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-                    console.log('🎨 提取到主题色:', hex);
+                    // 鍒涘缓涓婚鑹?                    const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+                    console.log('馃帹 鎻愬彇鍒颁富棰樿壊:', hex);
                     
-                    // 创建明显的渐变效果
-                    const palette = {
+                    // 鍒涘缓鏄庢樉鐨勬笎鍙樻晥鏋?                    const palette = {
                         gradients: {
                             light: {
                                 gradient: `linear-gradient(135deg, ${hex} 0%, ${hex}cc 50%, ${hex}99 100%)`
@@ -2106,13 +2080,12 @@ function getLocalPalette(imageUrl) {
                         }
                     };
                     
-                    console.log('✅ 生成调色板成功');
+                    console.log('鉁?鐢熸垚璋冭壊鏉挎垚鍔?);
                     resolve(palette);
                 } catch (error) {
-                    console.error('❌ 取色处理失败:', error);
+                    console.error('鉂?鍙栬壊澶勭悊澶辫触:', error);
                     
-                    // 返回备用调色板
-                    const fallbackPalette = {
+                    // 杩斿洖澶囩敤璋冭壊鏉?                    const fallbackPalette = {
                         gradients: {
                             light: {
                                 gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
@@ -2134,16 +2107,14 @@ function getLocalPalette(imageUrl) {
                     };
                     resolve(fallbackPalette);
                 } finally {
-                    // 清理对象URL以释放内存
-                    URL.revokeObjectURL(objectUrl);
+                    // 娓呯悊瀵硅薄URL浠ラ噴鏀惧唴瀛?                    URL.revokeObjectURL(objectUrl);
                 }
             }
                         
             img.onerror = () => {
-                console.error('❌ 图片加载失败，使用默认调色板');
+                console.error('鉂?鍥剧墖鍔犺浇澶辫触锛屼娇鐢ㄩ粯璁よ皟鑹叉澘');
                 
-                // 返回备用调色板
-                const fallbackPalette = {
+                // 杩斿洖澶囩敤璋冭壊鏉?                const fallbackPalette = {
                     gradients: {
                         light: {
                             gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
@@ -2165,28 +2136,27 @@ function getLocalPalette(imageUrl) {
                 };
                 resolve(fallbackPalette);
                 
-                // 清理对象URL以释放内存
-                URL.revokeObjectURL(objectUrl);
+                // 娓呯悊瀵硅薄URL浠ラ噴鏀惧唴瀛?                URL.revokeObjectURL(objectUrl);
             };
             
             img.src = objectUrl;
-            console.log('📡 开始加载图片...');
+            console.log('馃摗 寮€濮嬪姞杞藉浘鐗?..');
             
         } catch (fetchError) {
-            console.warn('⚠️ Fetch方式获取图片失败:', fetchError.message, '尝试传统方式');
+            console.warn('鈿狅笍 Fetch鏂瑰紡鑾峰彇鍥剧墖澶辫触:', fetchError.message, '灏濊瘯浼犵粺鏂瑰紡');
             
-            // 如果fetch方式失败，回退到传统的图片加载方式
+            // 濡傛灉fetch鏂瑰紡澶辫触锛屽洖閫€鍒颁紶缁熺殑鍥剧墖鍔犺浇鏂瑰紡
             const img = new Image();
-            // 移除crossOrigin属性以避免QQ音乐等跨域图片的CORS问题
+            // 绉婚櫎crossOrigin灞炴€т互閬垮厤QQ闊充箰绛夎法鍩熷浘鐗囩殑CORS闂
             // img.crossOrigin = "anonymous";
             
             img.onload = () => {
-                console.log('✅ 图片加载成功，尺寸:', img.width, 'x', img.height);
+                console.log('鉁?鍥剧墖鍔犺浇鎴愬姛锛屽昂瀵?', img.width, 'x', img.height);
                 try {
                     const canvas = document.createElement("canvas");
                     const ctx = canvas.getContext("2d");
                     
-                    // 调整画布大小，缩小图片以提高性能
+                    // 璋冩暣鐢诲竷澶у皬锛岀缉灏忓浘鐗囦互鎻愰珮鎬ц兘
                     const maxSize = 200;
                     let width = img.width;
                     let height = img.height;
@@ -2202,29 +2172,27 @@ function getLocalPalette(imageUrl) {
                     canvas.width = width;
                     canvas.height = height;
                     
-                    // 绘制图片到画布
-                    ctx.drawImage(img, 0, 0, width, height);
+                    // 缁樺埗鍥剧墖鍒扮敾甯?                    ctx.drawImage(img, 0, 0, width, height);
                     
-                    // 获取像素数据
+                    // 鑾峰彇鍍忕礌鏁版嵁
                     let imageData;
                     try {
                         imageData = ctx.getImageData(0, 0, width, height);
-                        console.log('📊 成功获取像素数据，像素数:', imageData.data.length / 4);
+                        console.log('馃搳 鎴愬姛鑾峰彇鍍忕礌鏁版嵁锛屽儚绱犳暟:', imageData.data.length / 4);
                     } catch (crossOriginError) {
-                        console.warn('❌ 跨域图片无法提取颜色，使用基于URL的颜色生成方案:', crossOriginError.message);
+                        console.warn('鉂?璺ㄥ煙鍥剧墖鏃犳硶鎻愬彇棰滆壊锛屼娇鐢ㄥ熀浜嶶RL鐨勯鑹茬敓鎴愭柟妗?', crossOriginError.message);
                         
-                        // 基于URL哈希生成主题色，确保同一图片始终生成相同颜色
+                        // 鍩轰簬URL鍝堝笇鐢熸垚涓婚鑹诧紝纭繚鍚屼竴鍥剧墖濮嬬粓鐢熸垚鐩稿悓棰滆壊
                         const hash = Array.from(imageUrl).reduce((acc, char) => {
                             acc = ((acc << 5) - acc) + char.charCodeAt(0);
                             return acc & acc;
                         }, 0);
                         
-                        // 使用哈希生成一个一致的主题色
-                        const hue = Math.abs(hash % 360);
+                        // 浣跨敤鍝堝笇鐢熸垚涓€涓竴鑷寸殑涓婚鑹?                        const hue = Math.abs(hash % 360);
                         const saturation = 60 + Math.abs(hash % 20);
                         const lightness = 65 + Math.abs(hash % 10);
 
-                        // 创建基于URL的调色板
+                        // 鍒涘缓鍩轰簬URL鐨勮皟鑹叉澘
                         const hex = `#${((1 << 24) + ((hue * 0.7) << 16) + ((saturation * 2.55) << 8) + (lightness * 2.55)).toString(16).slice(1)}`;
                         
                         const palette = {
@@ -2248,20 +2216,19 @@ function getLocalPalette(imageUrl) {
                             }
                         };
                         
-                        console.log('🎨 使用URL哈希生成调色板:', hex);
+                        console.log('馃帹 浣跨敤URL鍝堝笇鐢熸垚璋冭壊鏉?', hex);
                         resolve(palette);
                         return;
                     }
                     
                     const data = imageData.data;
                     
-                    // 改进的颜色提取：计算平均颜色
+                    // 鏀硅繘鐨勯鑹叉彁鍙栵細璁＄畻骞冲潎棰滆壊
                     let r = 0, g = 0, b = 0, count = 0;
                     
                     for (let i = 0; i < data.length; i += 4) {
                         const alpha = data[i + 3];
-                        if (alpha > 128) { // 只考虑不透明的像素
-                            r += data[i];
+                        if (alpha > 128) { // 鍙€冭檻涓嶉€忔槑鐨勫儚绱?                            r += data[i];
                             g += data[i + 1];
                             b += data[i + 2];
                             count++;
@@ -2269,9 +2236,8 @@ function getLocalPalette(imageUrl) {
                     }
                     
                     if (count === 0) {
-                        console.warn('⚠️ 没有找到不透明像素，使用默认调色板');
-                        // 返回默认调色板
-                        const defaultPalette = {
+                        console.warn('鈿狅笍 娌℃湁鎵惧埌涓嶉€忔槑鍍忕礌锛屼娇鐢ㄩ粯璁よ皟鑹叉澘');
+                        // 杩斿洖榛樿璋冭壊鏉?                        const defaultPalette = {
                             gradients: {
                                 light: {
                                     gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
@@ -2295,17 +2261,15 @@ function getLocalPalette(imageUrl) {
                         return;
                     }
                     
-                    // 计算平均颜色
+                    // 璁＄畻骞冲潎棰滆壊
                     r = Math.round(r / count);
                     g = Math.round(g / count);
                     b = Math.round(b / count);
                     
-                    // 创建主题色
-                    const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-                    console.log('🎨 提取到主题色:', hex);
+                    // 鍒涘缓涓婚鑹?                    const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+                    console.log('馃帹 鎻愬彇鍒颁富棰樿壊:', hex);
                     
-                    // 创建明显的渐变效果
-                    const palette = {
+                    // 鍒涘缓鏄庢樉鐨勬笎鍙樻晥鏋?                    const palette = {
                         gradients: {
                             light: {
                                 gradient: `linear-gradient(135deg, ${hex} 0%, ${hex}cc 50%, ${hex}99 100%)`
@@ -2326,13 +2290,12 @@ function getLocalPalette(imageUrl) {
                         }
                     };
                     
-                    console.log('✅ 生成调色板成功');
+                    console.log('鉁?鐢熸垚璋冭壊鏉挎垚鍔?);
                     resolve(palette);
                 } catch (error) {
-                    console.error('❌ 取色处理失败:', error);
+                    console.error('鉂?鍙栬壊澶勭悊澶辫触:', error);
                     
-                    // 返回备用调色板
-                    const fallbackPalette = {
+                    // 杩斿洖澶囩敤璋冭壊鏉?                    const fallbackPalette = {
                         gradients: {
                             light: {
                                 gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
@@ -2357,10 +2320,9 @@ function getLocalPalette(imageUrl) {
             }
             
             img.onerror = () => {
-                console.error('❌ 图片加载失败，使用默认调色板');
+                console.error('鉂?鍥剧墖鍔犺浇澶辫触锛屼娇鐢ㄩ粯璁よ皟鑹叉澘');
                 
-                // 返回备用调色板
-                const fallbackPalette = {
+                // 杩斿洖澶囩敤璋冭壊鏉?                const fallbackPalette = {
                     gradients: {
                         light: {
                             gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
@@ -2384,26 +2346,50 @@ function getLocalPalette(imageUrl) {
             };
             
             img.src = processedImageUrl;
-            console.log('📡 开始加载图片...');
+            console.log('馃摗 寮€濮嬪姞杞藉浘鐗?..');
         }
     });
+    
+    // 纭繚Promise鎬绘槸琚玶esolve锛屽嵆浣垮嚭鐜版湭鎹曡幏鐨勫紓甯?    } catch (unexpectedError) {
+        console.error('鉂?鏈湴鍙栬壊鍑虹幇鏈鏈熷紓甯?', unexpectedError);
+        
+        // 杩斿洖澶囩敤璋冭壊鏉?        const fallbackPalette = {
+            gradients: {
+                light: {
+                    gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                },
+                dark: {
+                    gradient: "linear-gradient(135deg, #2c3e50 0%, #34495e 100%)"
+                }
+            },
+            tokens: {
+                light: {
+                    primaryColor: "#667eea",
+                    primaryColorDark: "#764ba2"
+                },
+                dark: {
+                    primaryColor: "#3498db",
+                    primaryColorDark: "#2980b9"
+                }
+            }
+        };
+        resolve(fallbackPalette);
+    }
 }
 
 async function fetchPaletteData(imageUrl) {
-    console.log('🎨 开始获取调色板，图片URL:', imageUrl);
+    console.log('馃帹 寮€濮嬭幏鍙栬皟鑹叉澘锛屽浘鐗嘦RL:', imageUrl);
     
     if (paletteCache.has(imageUrl)) {
         const cached = paletteCache.get(imageUrl);
-        console.log('📦 使用缓存的调色板');
-        // 更新缓存顺序，将最近使用的放在最后
-        paletteCache.delete(imageUrl);
+        console.log('馃摝 浣跨敤缂撳瓨鐨勮皟鑹叉澘');
+        // 鏇存柊缂撳瓨椤哄簭锛屽皢鏈€杩戜娇鐢ㄧ殑鏀惧湪鏈€鍚?        paletteCache.delete(imageUrl);
         paletteCache.set(imageUrl, cached);
         return cached;
     }
 
-    // 对于酷我音乐的图片，直接返回默认调色板（酷我音乐功能暂未修复）
-    if (imageUrl.includes('kuwo')) {
-        console.log('🎵 酷我音乐图片，使用默认调色板');
+    // 瀵逛簬閰锋垜闊充箰鐨勫浘鐗囷紝鐩存帴杩斿洖榛樿璋冭壊鏉匡紙閰锋垜闊充箰鍔熻兘鏆傛湭淇锛?    if (imageUrl.includes('kuwo')) {
+        console.log('馃幍 閰锋垜闊充箰鍥剧墖锛屼娇鐢ㄩ粯璁よ皟鑹叉澘');
         const defaultPalette = {
             gradients: {
                 light: {
@@ -2430,22 +2416,22 @@ async function fetchPaletteData(imageUrl) {
     }
 
     try {
-        console.log('🔍 尝试本地取色');
-        // 优先尝试本地取色，本地取色更可靠
+        console.log('馃攳 灏濊瘯鏈湴鍙栬壊');
+        // 浼樺厛灏濊瘯鏈湴鍙栬壊锛屾湰鍦板彇鑹叉洿鍙潬
         const localPalette = await getLocalPalette(imageUrl);
         if (localPalette) {
-            console.log('✅ 本地取色成功，缓存调色板');
+            console.log('鉁?鏈湴鍙栬壊鎴愬姛锛岀紦瀛樿皟鑹叉澘');
             paletteCache.set(imageUrl, localPalette);
             persistPaletteCache();
             return localPalette;
         }
-        console.warn('⚠️ 本地取色返回空，使用默认调色板');
+        console.warn('鈿狅笍 鏈湴鍙栬壊杩斿洖绌猴紝浣跨敤榛樿璋冭壊鏉?);
     } catch (localError) {
-        console.error('❌ 本地取色异常:', localError);
+        console.error('鉂?鏈湴鍙栬壊寮傚父:', localError);
     }
 
-    // 如果本地取色失败，返回默认调色板
-    console.log('📋 使用默认调色板');
+    // 濡傛灉鏈湴鍙栬壊澶辫触锛岃繑鍥為粯璁よ皟鑹叉澘
+    console.log('馃搵 浣跨敤榛樿璋冭壊鏉?);
     const defaultPalette = {
         gradients: {
             light: {
@@ -2476,39 +2462,38 @@ async function updateDynamicBackground(imageUrl) {
     paletteRequestId += 1;
     const requestId = paletteRequestId;
 
-    console.log('🎭 更新动态背景，图片URL:', imageUrl);
-    debugLog(`动态背景: 更新至新的图片 ${imageUrl}`);
+    console.log('馃幁 鏇存柊鍔ㄦ€佽儗鏅紝鍥剧墖URL:', imageUrl);
+    debugLog(`鍔ㄦ€佽儗鏅? 鏇存柊鑷虫柊鐨勫浘鐗?${imageUrl}`);
 
     if (!imageUrl) {
-        console.warn('❌ 图片URL为空，重置动态背景');
+        console.warn('鉂?鍥剧墖URL涓虹┖锛岄噸缃姩鎬佽儗鏅?);
         resetDynamicBackground();
         return;
     }
 
-    // 如果图片URL与当前相同且已有调色板，直接使用
+    // 濡傛灉鍥剧墖URL涓庡綋鍓嶇浉鍚屼笖宸叉湁璋冭壊鏉匡紝鐩存帴浣跨敤
     if (state.currentPaletteImage === imageUrl && state.dynamicPalette) {
-        console.log('🔄 图片URL相同且已有调色板，直接应用');
+        console.log('馃攧 鍥剧墖URL鐩稿悓涓斿凡鏈夎皟鑹叉澘锛岀洿鎺ュ簲鐢?);
         queuePaletteApplication(state.dynamicPalette, imageUrl);
         return;
     }
 
     try {
-        // 获取或生成调色板
+        // 鑾峰彇鎴栫敓鎴愯皟鑹叉澘
         const palette = await fetchPaletteData(imageUrl);
         
-        // 检查请求是否已被取消
-        if (requestId !== paletteRequestId) {
-            console.log('⏭️ 请求已被取消，跳过应用调色板');
+        // 妫€鏌ヨ姹傛槸鍚﹀凡琚彇娑?        if (requestId !== paletteRequestId) {
+            console.log('鈴笍 璇锋眰宸茶鍙栨秷锛岃烦杩囧簲鐢ㄨ皟鑹叉澘');
             return;
         }
         
-        console.log('🎨 应用调色板到背景');
+        console.log('馃帹 搴旂敤璋冭壊鏉垮埌鑳屾櫙');
         queuePaletteApplication(palette, imageUrl);
     } catch (error) {
-        console.error("❌ 获取动态背景失败:", error);
-        debugLog(`动态背景加载失败: ${error}`);
+        console.error("鉂?鑾峰彇鍔ㄦ€佽儗鏅け璐?", error);
+        debugLog(`鍔ㄦ€佽儗鏅姞杞藉け璐? ${error}`);
         if (requestId === paletteRequestId) {
-            console.log('🔄 重置动态背景');
+            console.log('馃攧 閲嶇疆鍔ㄦ€佽儗鏅?);
             resetDynamicBackground();
         }
     }
@@ -2539,7 +2524,7 @@ function saveFavoriteState(options = {}) {
     safeSetLocalStorage("favoritePlaybackTime", String(state.favoritePlaybackTime || 0), { skipRemote });
 }
 
-// 调试日志函数
+// 璋冭瘯鏃ュ織鍑芥暟
 function debugLog(message) {
     console.log(`[DEBUG] ${message}`);
     if (state.debugMode) {
@@ -2557,34 +2542,31 @@ function debugLog(message) {
     }
 }
 
-// 启用调试模式（按Ctrl+D）
-document.addEventListener("keydown", (e) => {
+// 鍚敤璋冭瘯妯″紡锛堟寜Ctrl+D锛?document.addEventListener("keydown", (e) => {
     if (e.ctrlKey && e.key === "d") {
         e.preventDefault();
         state.debugMode = !state.debugMode;
         if (state.debugMode) {
             dom.debugInfo.classList.add("show");
-            debugLog("调试模式已启用");
+            debugLog("璋冭瘯妯″紡宸插惎鐢?);
         } else {
             dom.debugInfo.classList.remove("show");
         }
     }
 });
 
-// 新增：切换搜索模式
-function toggleSearchMode(enable) {
+// 鏂板锛氬垏鎹㈡悳绱㈡ā寮?function toggleSearchMode(enable) {
     state.isSearchMode = enable;
     if (enable) {
         dom.container.classList.add("search-mode");
-        debugLog("进入搜索模式");
+        debugLog("杩涘叆鎼滅储妯″紡");
     } else {
         dom.container.classList.remove("search-mode");
-        debugLog("退出搜索模式");
+        debugLog("閫€鍑烘悳绱㈡ā寮?);
     }
 }
 
-// 新增：显示搜索结果
-function showSearchResults(options = {}) {
+// 鏂板锛氭樉绀烘悳绱㈢粨鏋?function showSearchResults(options = {}) {
     const { restore = false } = options;
     toggleSearchMode(true);
     if (state.sourceMenuOpen) {
@@ -2598,7 +2580,7 @@ function showSearchResults(options = {}) {
     }
 }
 
-// 新增：隐藏搜索结果 - 优化立即收起
+// 鏂板锛氶殣钘忔悳绱㈢粨鏋?- 浼樺寲绔嬪嵆鏀惰捣
 function hideSearchResults() {
     toggleSearchMode(false);
     if (state.sourceMenuOpen) {
@@ -2607,7 +2589,7 @@ function hideSearchResults() {
     if (state.qualityMenuOpen) {
         schedulePlayerQualityMenuPositionUpdate();
     }
-    // 立即清空搜索结果内容
+    // 绔嬪嵆娓呯┖鎼滅储缁撴灉鍐呭
     const container = dom.searchResultsList || dom.searchResults;
     if (container) {
         container.innerHTML = "";
@@ -2697,7 +2679,7 @@ function handleSearchInputFocus() {
             try {
                 dom.searchInput.select();
             } catch (error) {
-                console.warn("选择搜索文本失败", error);
+                console.warn("閫夋嫨鎼滅储鏂囨湰澶辫触", error);
             }
         });
     }
@@ -2706,9 +2688,9 @@ function handleSearchInputFocus() {
 }
 
 const playModeTexts = {
-    "list": "列表循环",
-    "single": "单曲循环",
-    "random": "随机播放"
+    "list": "鍒楄〃寰幆",
+    "single": "鍗曟洸寰幆",
+    "random": "闅忔満鎾斁"
 };
 
 const playModeIcons = {
@@ -2751,7 +2733,7 @@ function updateShuffleButtonUI() {
     button.setAttribute("aria-pressed", isRandom ? "true" : "false");
     const iconClass = isRandom ? "shuffle-icon shuffle-icon--on" : "shuffle-icon shuffle-icon--off";
     button.innerHTML = `<i class="fas fa-shuffle ${iconClass}"></i>`;
-    const label = isRandom ? "关闭随机播放" : "开启随机播放";
+    const label = isRandom ? "鍏抽棴闅忔満鎾斁" : "寮€鍚殢鏈烘挱鏀?;
     button.title = label;
     button.setAttribute("aria-label", label);
 }
@@ -2760,7 +2742,7 @@ function updatePlayModeUI() {
     const mode = getActivePlayMode();
     if (dom.playModeBtn) {
         dom.playModeBtn.innerHTML = `<i class="fas ${playModeIcons[mode] || playModeIcons.list}"></i>`;
-        dom.playModeBtn.title = `播放模式: ${playModeTexts[mode] || playModeTexts.list}`;
+        dom.playModeBtn.title = `鎾斁妯″紡: ${playModeTexts[mode] || playModeTexts.list}`;
     }
     updateShuffleButtonUI();
 }
@@ -2797,15 +2779,14 @@ function setPlayMode(mode, { announce = true } = {}) {
 
     if (announce) {
         const modeText = playModeTexts[mode] || playModeTexts.list;
-        showNotification(`播放模式: ${modeText}`);
-        debugLog(`播放模式切换为: ${mode} (列表: ${state.currentList})`);
+        showNotification(`鎾斁妯″紡: ${modeText}`);
+        debugLog(`鎾斁妯″紡鍒囨崲涓? ${mode} (鍒楄〃: ${state.currentList})`);
     }
 
     return mode;
 }
 
-// 新增：播放模式切换
-function togglePlayMode() {
+// 鏂板锛氭挱鏀炬ā寮忓垏鎹?function togglePlayMode() {
     const modes = isMobileView ? ["list", "single", "random"] : ["list", "single"];
     const currentMode = getActivePlayMode();
     let currentIndex = modes.indexOf(currentMode);
@@ -2845,7 +2826,7 @@ function updatePlayPauseButton() {
     if (!dom.playPauseBtn) return;
     const isPlaying = !dom.audioPlayer.paused && !dom.audioPlayer.ended;
     dom.playPauseBtn.innerHTML = `<i class="fas ${isPlaying ? "fa-pause" : "fa-play"}"></i>`;
-    dom.playPauseBtn.title = isPlaying ? "暂停" : "播放";
+    dom.playPauseBtn.title = isPlaying ? "鏆傚仠" : "鎾斁";
     if (document.body) {
         document.body.classList.toggle("is-playing", isPlaying);
     }
@@ -2920,7 +2901,7 @@ function handleTimeUpdate() {
     }
 }
 
-// 针对酷我音乐的额外修复：监控currentTime变化（已禁用，因为酷我音乐功能暂未修复）
+// 閽堝閰锋垜闊充箰鐨勯澶栦慨澶嶏細鐩戞帶currentTime鍙樺寲锛堝凡绂佺敤锛屽洜涓洪叿鎴戦煶涔愬姛鑳芥殏鏈慨澶嶏級
 /*
 let currentTimeMonitor = null;
 function startCurrentTimeMonitor() {
@@ -2941,17 +2922,17 @@ function startCurrentTimeMonitor() {
                 consecutiveSameTime = 0;
             }
             
-            // 如果连续5次检查currentTime都没有变化，尝试重置播放
+            // 濡傛灉杩炵画5娆℃鏌urrentTime閮芥病鏈夊彉鍖栵紝灏濊瘯閲嶇疆鎾斁
             if (consecutiveSameTime >= 5 && !dom.audioPlayer.paused) {
                 consecutiveSameTime = 0;
                 
-                // 保存当前进度
+                // 淇濆瓨褰撳墠杩涘害
                 const savedTime = currentTime;
                 
-                // 尝试重置播放
+                // 灏濊瘯閲嶇疆鎾斁
                 dom.audioPlayer.currentTime = Math.max(0, savedTime - 0.5);
                 dom.audioPlayer.play().catch(() => {
-                    // 忽略播放错误
+                    // 蹇界暐鎾斁閿欒
                 });
             }
             
@@ -2961,7 +2942,7 @@ function startCurrentTimeMonitor() {
 }
 */
 
-// 保留stopCurrentTimeMonitor函数，避免运行时错误
+// 淇濈暀stopCurrentTimeMonitor鍑芥暟锛岄伩鍏嶈繍琛屾椂閿欒
 let currentTimeMonitor = null;
 function stopCurrentTimeMonitor() {
     if (currentTimeMonitor) {
@@ -2994,7 +2975,7 @@ function setAudioCurrentTime(time) {
     try {
         dom.audioPlayer.currentTime = clamped;
     } catch (error) {
-        console.warn("设置播放进度失败", error);
+        console.warn("璁剧疆鎾斁杩涘害澶辫触", error);
     }
     dom.progressBar.value = clamped;
     dom.currentTimeDisplay.textContent = formatTime(clamped);
@@ -3039,7 +3020,7 @@ async function togglePlayPause() {
                 : 0;
             await playPlaylistSong(targetIndex);
         } else {
-            showNotification("播放列表为空，请先添加歌曲", "error");
+            showNotification("鎾斁鍒楄〃涓虹┖锛岃鍏堟坊鍔犳瓕鏇?, "error");
         }
         return;
     }
@@ -3052,8 +3033,8 @@ async function togglePlayPause() {
                 preserveProgress: true,
             });
         } catch (error) {
-            console.error("恢复播放失败:", error);
-            showNotification("播放失败，请稍后重试", "error");
+            console.error("鎭㈠鎾斁澶辫触:", error);
+            showNotification("鎾斁澶辫触锛岃绋嶅悗閲嶈瘯", "error");
         }
         return;
     }
@@ -3063,15 +3044,15 @@ async function togglePlayPause() {
         const playPromise = dom.audioPlayer.play();
         if (playPromise !== undefined) {
             playPromise.catch(error => {
-                console.error("play() Promise被拒绝:", error);
+                console.error("play() Promise琚嫆缁?", error);
                 
-                // 关键修复：检查实际播放状态，而不仅仅依赖Promise结果
+                // 鍏抽敭淇锛氭鏌ュ疄闄呮挱鏀剧姸鎬侊紝鑰屼笉浠呬粎渚濊禆Promise缁撴灉
                 if (!dom.audioPlayer.paused) {
-                    console.log("✅ 虽然play() Promise被拒绝，但音频实际播放成功");
+                    console.log("鉁?铏界劧play() Promise琚嫆缁濓紝浣嗛煶棰戝疄闄呮挱鏀炬垚鍔?);
                     state.isPlaying = true;
                 } else {
-                    console.error("播放确实失败:", error);
-                    showNotification("播放失败，请检查网络连接", "error");
+                    console.error("鎾斁纭疄澶辫触:", error);
+                    showNotification("鎾斁澶辫触锛岃妫€鏌ョ綉缁滆繛鎺?, "error");
                     state.isPlaying = false;
                 }
             });
@@ -3106,8 +3087,8 @@ function updateSourceLabel() {
     dom.sourceSelectLabel.textContent = option.label;
     dom.sourceSelectButton.dataset.source = option.value;
     dom.sourceSelectButton.setAttribute("aria-expanded", state.sourceMenuOpen ? "true" : "false");
-    dom.sourceSelectButton.setAttribute("aria-label", `当前音源：${option.label}，点击切换音源`);
-    dom.sourceSelectButton.setAttribute("title", `音源：${option.label}`);
+    dom.sourceSelectButton.setAttribute("aria-label", `褰撳墠闊虫簮锛?{option.label}锛岀偣鍑诲垏鎹㈤煶婧恅);
+    dom.sourceSelectButton.setAttribute("title", `闊虫簮锛?{option.label}`);
 }
 
 function updateSourceMenuPosition() {
@@ -3269,12 +3250,12 @@ function updateQualityLabel() {
     const option = QUALITY_OPTIONS.find(item => item.value === state.playbackQuality) || QUALITY_OPTIONS[0];
     if (!option) return;
     dom.qualityLabel.textContent = option.label;
-    dom.qualityToggle.title = `音质: ${option.label} (${option.description})`;
+    dom.qualityToggle.title = `闊宠川: ${option.label} (${option.description})`;
     if (dom.mobileQualityLabel) {
         dom.mobileQualityLabel.textContent = option.label;
     }
     if (dom.mobileQualityToggle) {
-        dom.mobileQualityToggle.title = `音质: ${option.label} (${option.description})`;
+        dom.mobileQualityToggle.title = `闊宠川: ${option.label} (${option.description})`;
     }
 }
 
@@ -3470,13 +3451,13 @@ async function selectPlaybackQuality(quality) {
 
     const option = QUALITY_OPTIONS.find(item => item.value === normalized);
     if (option) {
-        showNotification(`音质已切换为 ${option.label} (${option.description})`);
+        showNotification(`闊宠川宸插垏鎹负 ${option.label} (${option.description})`);
     }
 
     if (state.currentSong) {
         const success = await reloadCurrentSong();
         if (!success) {
-            showNotification("切换音质失败，请稍后重试", "error");
+            showNotification("鍒囨崲闊宠川澶辫触锛岃绋嶅悗閲嶈瘯", "error");
         }
     }
 }
@@ -3497,7 +3478,7 @@ async function reloadCurrentSong() {
         }
         return true;
     } catch (error) {
-        console.error("切换音质失败:", error);
+        console.error("鍒囨崲闊宠川澶辫触:", error);
         return false;
     }
 }
@@ -3513,39 +3494,34 @@ async function restoreCurrentSongState() {
         dom.audioPlayer.pause();
         updatePlayPauseButton();
     } catch (error) {
-        console.warn("恢复音频失败:", error);
+        console.warn("鎭㈠闊抽澶辫触:", error);
     }
 }
 
 // ================================================
-// 锁屏操作拦截器
-// ================================================
+// 閿佸睆鎿嶄綔鎷︽埅鍣?// ================================================
 function setupLockScreenInterceptor() {
-    // 拦截全局播放函数，标记锁屏状态
-    const functionsToPatch = ['playNext', 'playPrevious', 'playPlaylistSong', 'autoPlayNext'];
+    // 鎷︽埅鍏ㄥ眬鎾斁鍑芥暟锛屾爣璁伴攣灞忕姸鎬?    const functionsToPatch = ['playNext', 'playPrevious', 'playPlaylistSong', 'autoPlayNext'];
     
     functionsToPatch.forEach(fnName => {
         if (typeof window[fnName] === 'function') {
             const original = window[fnName];
             window[fnName] = function(...args) {
-                // 如果页面不可见（锁屏/后台），强制启用增强重同步
-                if (document.visibilityState === 'hidden') {
-                    console.log(`🔒 锁屏调用: ${fnName}`);
-                    // 这里我们利用 JS 的闭包特性或者修改 playSong 的默认参数
-                    // 但最简单的是直接调用，因为 playSong 内部已经检测了 visibilityState
+                // 濡傛灉椤甸潰涓嶅彲瑙侊紙閿佸睆/鍚庡彴锛夛紝寮哄埗鍚敤澧炲己閲嶅悓姝?                if (document.visibilityState === 'hidden') {
+                    console.log(`馃敀 閿佸睆璋冪敤: ${fnName}`);
+                    // 杩欓噷鎴戜滑鍒╃敤 JS 鐨勯棴鍖呯壒鎬ф垨鑰呬慨鏀?playSong 鐨勯粯璁ゅ弬鏁?                    // 浣嗘渶绠€鍗曠殑鏄洿鎺ヨ皟鐢紝鍥犱负 playSong 鍐呴儴宸茬粡妫€娴嬩簡 visibilityState
                 }
                 return original.apply(this, args);
             };
         }
     });
 
-    // 监听 Media Session 的下一曲/上一曲
-    if ('mediaSession' in navigator) {
+    // 鐩戝惉 Media Session 鐨勪笅涓€鏇?涓婁竴鏇?    if ('mediaSession' in navigator) {
         const actionHandlers = [['nexttrack', 'playNext'], ['previoustrack', 'playPrevious']];
         actionHandlers.forEach(([action, globalFn]) => {
             try {
                 navigator.mediaSession.setActionHandler(action, () => {
-                    console.log(`🔒 锁屏 MediaSession: ${action}`);
+                    console.log(`馃敀 閿佸睆 MediaSession: ${action}`);
                     if (window[globalFn]) window[globalFn]();
                 });
             } catch(e) {}
@@ -3553,14 +3529,12 @@ function setupLockScreenInterceptor() {
     }
 }
 
-// 确保在初始化时调用它
-// 请在 window.addEventListener("load", ...) 之前调用
+// 纭繚鍦ㄥ垵濮嬪寲鏃惰皟鐢ㄥ畠
+// 璇峰湪 window.addEventListener("load", ...) 涔嬪墠璋冪敤
 setupLockScreenInterceptor();
 
 window.addEventListener("load", setupInteractions);
-// 仅在浏览器不支持 Media Session API 时监听 ended 事件，
-// 避免与媒体会话的结束回调重复触发自动播放。
-if (!("mediaSession" in navigator)) {
+// 浠呭湪娴忚鍣ㄤ笉鏀寔 Media Session API 鏃剁洃鍚?ended 浜嬩欢锛?// 閬垮厤涓庡獟浣撲細璇濈殑缁撴潫鍥炶皟閲嶅瑙﹀彂鑷姩鎾斁銆?if (!("mediaSession" in navigator)) {
     dom.audioPlayer.addEventListener("ended", autoPlayNext);
 }
 
@@ -3689,9 +3663,9 @@ function setupInteractions() {
                 const added = addSongToPlaylist(song);
                 if (added) {
                     renderPlaylist();
-                    showNotification("已添加到播放列表", "success");
+                    showNotification("宸叉坊鍔犲埌鎾斁鍒楄〃", "success");
                 } else {
-                    showNotification("播放列表已包含该歌曲", "warning");
+                    showNotification("鎾斁鍒楄〃宸插寘鍚姝屾洸", "warning");
                 }
             } else if (action === "download") {
                 event.preventDefault();
@@ -3702,7 +3676,7 @@ function setupInteractions() {
                 event.stopPropagation();
                 const removed = removeFavoriteAtIndex(index);
                 if (removed) {
-                    showNotification("已从收藏列表移除", "success");
+                    showNotification("宸蹭粠鏀惰棌鍒楄〃绉婚櫎", "success");
                 }
             }
         };
@@ -3760,7 +3734,7 @@ function setupInteractions() {
         }
         document.body.classList.toggle("dark-mode", isDark);
         dom.themeToggleButton.classList.toggle("is-dark", isDark);
-        const label = isDark ? "切换为浅色模式" : "切换为深色模式";
+        const label = isDark ? "鍒囨崲涓烘祬鑹叉ā寮? : "鍒囨崲涓烘繁鑹叉ā寮?;
         dom.themeToggleButton.setAttribute("aria-label", label);
         dom.themeToggleButton.setAttribute("title", label);
         applyDynamicGradient();
@@ -3768,8 +3742,7 @@ function setupInteractions() {
 
     captureThemeDefaults();
     const savedTheme = safeGetLocalStorage("theme");
-    // 默认使用浅色主题，不再跟随系统偏好
-    const initialIsDark = savedTheme ? savedTheme === "dark" : false;
+    // 榛樿浣跨敤娴呰壊涓婚锛屼笉鍐嶈窡闅忕郴缁熷亸濂?    const initialIsDark = savedTheme ? savedTheme === "dark" : false;
     applyTheme(initialIsDark);
 
     dom.themeToggleButton.addEventListener("click", () => {
@@ -3778,7 +3751,7 @@ function setupInteractions() {
         safeSetLocalStorage("theme", isDark ? "dark" : "light");
     });
 
-    // 为移动端标题添加主题切换功能
+    // 涓虹Щ鍔ㄧ鏍囬娣诲姞涓婚鍒囨崲鍔熻兘
     if (dom.mobileToolbarTitle) {
         dom.mobileToolbarTitle.addEventListener("click", () => {
             const isDark = document.body.classList.contains("dark-mode");
@@ -3999,7 +3972,7 @@ function setupInteractions() {
         });
     }
 
-    // 播放模式按钮事件
+    // 鎾斁妯″紡鎸夐挳浜嬩欢
     updatePlayModeUI();
     if (dom.playModeBtn) {
         dom.playModeBtn.addEventListener("click", togglePlayMode);
@@ -4008,16 +3981,15 @@ function setupInteractions() {
         dom.shuffleToggleBtn.addEventListener("click", toggleShuffleMode);
     }
 
-    // 搜索相关事件 - 修复搜索下拉框显示问题
-    dom.searchBtn.addEventListener("click", (e) => {
+    // 鎼滅储鐩稿叧浜嬩欢 - 淇鎼滅储涓嬫媺妗嗘樉绀洪棶棰?    dom.searchBtn.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-        debugLog("搜索按钮被点击");
+        debugLog("鎼滅储鎸夐挳琚偣鍑?);
         performSearch();
     });
 
     dom.searchInput.addEventListener("focus", () => {
-        debugLog("搜索输入框获得焦点，尝试恢复上次搜索结果");
+        debugLog("鎼滅储杈撳叆妗嗚幏寰楃劍鐐癸紝灏濊瘯鎭㈠涓婃鎼滅储缁撴灉");
         handleSearchInputFocus();
     });
 
@@ -4025,18 +3997,18 @@ function setupInteractions() {
         if (e.key === "Enter") {
             e.preventDefault();
             e.stopPropagation();
-            debugLog("搜索输入框回车键被按下");
+            debugLog("鎼滅储杈撳叆妗嗗洖杞﹂敭琚寜涓?);
             performSearch();
         }
     });
 
     updateImportSelectedButton();
 
-    // 修复：点击搜索区域外部时隐藏搜索结果
+    // 淇锛氱偣鍑绘悳绱㈠尯鍩熷閮ㄦ椂闅愯棌鎼滅储缁撴灉
     document.addEventListener("click", (e) => {
         const searchArea = document.querySelector(".search-area");
         if (searchArea && !searchArea.contains(e.target) && state.isSearchMode) {
-            debugLog("点击搜索区域外部，隐藏搜索结果");
+            debugLog("鐐瑰嚮鎼滅储鍖哄煙澶栭儴锛岄殣钘忔悳绱㈢粨鏋?);
             hideSearchResults();
         }
     });
@@ -4050,7 +4022,7 @@ function setupInteractions() {
         }
     });
 
-    // 搜索结果相关事件处理 - 修复加载更多按钮点击问题
+    // 鎼滅储缁撴灉鐩稿叧浜嬩欢澶勭悊 - 淇鍔犺浇鏇村鎸夐挳鐐瑰嚮闂
     document.addEventListener("click", (e) => {
         const qualityMenus = document.querySelectorAll(".quality-menu");
         qualityMenus.forEach(menu => {
@@ -4081,36 +4053,34 @@ function setupInteractions() {
         }
     });
 
-    // 修复：使用更强健的事件委托处理加载更多按钮点击
-    dom.searchResults.addEventListener("click", (e) => {
-        debugLog(`点击事件触发: ${e.target.tagName} ${e.target.className} ${e.target.id}`);
+    // 淇锛氫娇鐢ㄦ洿寮哄仴鐨勪簨浠跺鎵樺鐞嗗姞杞芥洿澶氭寜閽偣鍑?    dom.searchResults.addEventListener("click", (e) => {
+        debugLog(`鐐瑰嚮浜嬩欢瑙﹀彂: ${e.target.tagName} ${e.target.className} ${e.target.id}`);
 
-        // 检查多种可能的目标元素
+        // 妫€鏌ュ绉嶅彲鑳界殑鐩爣鍏冪礌
         const loadMoreBtn = e.target.closest(".load-more-btn") || 
                            e.target.closest("#loadMoreBtn") ||
                            (e.target.id === "loadMoreBtn" ? e.target : null) ||
                            (e.target.classList.contains("load-more-btn") ? e.target : null);
 
         if (loadMoreBtn) {
-            debugLog("检测到加载更多按钮点击");
+            debugLog("妫€娴嬪埌鍔犺浇鏇村鎸夐挳鐐瑰嚮");
             e.preventDefault();
             e.stopPropagation();
             loadMoreResults();
         }
     });
 
-    // 额外的直接事件监听器作为备用
+    // 棰濆鐨勭洿鎺ヤ簨浠剁洃鍚櫒浣滀负澶囩敤
     document.addEventListener("click", (e) => {
         if (e.target.id === "loadMoreBtn" || e.target.closest("#loadMoreBtn")) {
-            debugLog("备用事件监听器触发");
+            debugLog("澶囩敤浜嬩欢鐩戝惉鍣ㄨЕ鍙?);
             e.preventDefault();
             e.stopPropagation();
             loadMoreResults();
         }
     });
 
-    // 新增：歌词滚动监听
-    const attachLyricScrollHandler = (scrollElement, getCurrentElement) => {
+    // 鏂板锛氭瓕璇嶆粴鍔ㄧ洃鍚?    const attachLyricScrollHandler = (scrollElement, getCurrentElement) => {
         if (!scrollElement) {
             return;
         }
@@ -4149,7 +4119,7 @@ function setupInteractions() {
             state.currentSong = restoredSong;
             updatePlaylistHighlight();
             updateCurrentSongInfo(restoredSong, { updateBackground: true }).catch(error => {
-                console.error("恢复歌曲信息失败:", error);
+                console.error("鎭㈠姝屾洸淇℃伅澶辫触:", error);
             });
         }
 
@@ -4172,53 +4142,51 @@ function setupInteractions() {
     }
     
     // ==========================================
-    // 在函数末尾添加以下代码：
+    // 鍦ㄥ嚱鏁版湯灏炬坊鍔犱互涓嬩唬鐮侊細
     // ==========================================
     
-    // 设置解锁自动恢复
+    // 璁剧疆瑙ｉ攣鑷姩鎭㈠
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
-            // 刚从锁屏解锁
+            // 鍒氫粠閿佸睆瑙ｉ攣
             setTimeout(() => {
                 const player = dom.audioPlayer;
                 if (player && !player.paused && player.currentTime > 0) {
-                    console.log('🔄 解锁后音频状态检查');
+                    console.log('馃攧 瑙ｉ攣鍚庨煶棰戠姸鎬佹鏌?);
                     
-                    // 检查是否是 iOS PWA
+                    // 妫€鏌ユ槸鍚︽槸 iOS PWA
                     const isIOSPWA = /iPad|iPhone|iPod/.test(navigator.userAgent) && 
                                     window.navigator.standalone === true;
                     
                     if (isIOSPWA) {
-                        // 执行简化的硬件重同步
-                        const currentTime = player.currentTime;
+                        // 鎵ц绠€鍖栫殑纭欢閲嶅悓姝?                        const currentTime = player.currentTime;
                         player.pause();
                         
                         setTimeout(() => {
-                            player.currentTime = currentTime + 0.001; // 微调 1 毫秒
+                            player.currentTime = currentTime + 0.001; // 寰皟 1 姣
                             player.play().catch(e => {
-                                console.log('🔄 解锁后播放失败:', e);
+                                console.log('馃攧 瑙ｉ攣鍚庢挱鏀惧け璐?', e);
                             });
                         }, 50);
                     }
                 }
             }, 500);
             
-            // 闪电侠模式：解锁后瞬间完成所有延迟的UI更新
+            // 闂數渚犳ā寮忥細瑙ｉ攣鍚庣灛闂村畬鎴愭墍鏈夊欢杩熺殑UI鏇存柊
             if (state.needUpdateOnUnlock && state.currentSong) {
-                console.log('🦸 闪电侠模式：解锁后瞬间更新UI');
-                // 使用 requestAnimationFrame 确保渲染帧就绪
-                requestAnimationFrame(() => {
+                console.log('馃Ω 闂數渚犳ā寮忥細瑙ｉ攣鍚庣灛闂存洿鏂癠I');
+                // 浣跨敤 requestAnimationFrame 纭繚娓叉煋甯у氨缁?                requestAnimationFrame(() => {
                     if (state.currentSong) {
-                        // 补全之前跳过的 UI 更新
+                        // 琛ュ叏涔嬪墠璺宠繃鐨?UI 鏇存柊
                         updateCurrentSongInfo(state.currentSong, {
                             loadArtwork: true,
                             updateBackground: true
                         });
                         
-                        // 补全歌词滚动位置
+                        // 琛ュ叏姝岃瘝婊氬姩浣嶇疆
                         loadLyrics(state.currentSong);
                         
-                        // 重置标记
+                        // 閲嶇疆鏍囪
                         state.needUpdateOnUnlock = false;
                     }
                 });
@@ -4226,32 +4194,29 @@ function setupInteractions() {
         }
     });
     
-    // 1. 设置解锁恢复机制
+    // 1. 璁剧疆瑙ｉ攣鎭㈠鏈哄埗
     setupUnlockRecovery();
     
-    // 2. 环境检测日志
-    console.log('🎵 播放器环境检测:', {
+    // 2. 鐜妫€娴嬫棩蹇?    console.log('馃幍 鎾斁鍣ㄧ幆澧冩娴?', {
         isIOSPWA: isIOSPWA(),
         userAgent: navigator.userAgent.substring(0, 80),
         displayMode: window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser',
         navigatorStandalone: window.navigator.standalone
     });
     
-    // 3. 调试工具
+    // 3. 璋冭瘯宸ュ叿
     window.solaraPlayer = {
-        // 环境检测
-        env: () => ({
-            mode: isIOSPWA() ? '📱 PWA独立模式' : '🌐 浏览器模式',
-            stealth: shouldUseStealthMode() ? '🔒 隐身模式' : '🌐 正常模式',
+        // 鐜妫€娴?        env: () => ({
+            mode: isIOSPWA() ? '馃摫 PWA鐙珛妯″紡' : '馃寪 娴忚鍣ㄦā寮?,
+            stealth: shouldUseStealthMode() ? '馃敀 闅愯韩妯″紡' : '馃寪 姝ｅ父妯″紡',
             visibility: document.visibilityState
         }),
         
-        // 状态查看
-        status: () => ({
-            currentSong: state.currentSong ? state.currentSong.name : '无',
-            pendingUpdate: state.pendingStealthUpdate ? '有' : '无',
+        // 鐘舵€佹煡鐪?        status: () => ({
+            currentSong: state.currentSong ? state.currentSong.name : '鏃?,
+            pendingUpdate: state.pendingStealthUpdate ? '鏈? : '鏃?,
             audio: {
-                src: dom.audioPlayer.src ? '已设置' : '未设置',
+                src: dom.audioPlayer.src ? '宸茶缃? : '鏈缃?,
                 playing: !dom.audioPlayer.paused,
                 time: dom.audioPlayer.currentTime.toFixed(1),
                 volume: dom.audioPlayer.volume,
@@ -4259,13 +4224,13 @@ function setupInteractions() {
             }
         }),
         
-        // 强制恢复
+        // 寮哄埗鎭㈠
         forceRecovery: () => performUnlockRecovery(),
         
-        // 测试隐身模式
+        // 娴嬭瘯闅愯韩妯″紡
         testStealth: () => {
             if (state.currentSong) {
-                console.log('测试隐身模式...');
+                console.log('娴嬭瘯闅愯韩妯″紡...');
                 state.pendingStealthUpdate = {
                     song: state.currentSong,
                     timestamp: Date.now(),
@@ -4278,67 +4243,63 @@ function setupInteractions() {
         }
     };
     
-    console.log('✅ iOS PWA 锁屏修复方案已加载');
+    console.log('鉁?iOS PWA 閿佸睆淇鏂规宸插姞杞?);
 }
 
 // ================================================
-// 隐身模式专用：更新锁屏媒体信息
-// ================================================
+// 闅愯韩妯″紡涓撶敤锛氭洿鏂伴攣灞忓獟浣撲俊鎭?// ================================================
 function updateMediaMetadataForStealthMode(song) {
     if (!('mediaSession' in navigator)) return;
     
     try {
-        // 直接获取封面列表，getArtworkListForLockScreen会处理默认值
-        const artworkList = getArtworkListForLockScreen(song);
+        // 鐩存帴鑾峰彇灏侀潰鍒楄〃锛実etArtworkListForLockScreen浼氬鐞嗛粯璁ゅ€?        const artworkList = getArtworkListForLockScreen(song);
         
-        // 更新锁屏媒体信息
+        // 鏇存柊閿佸睆濯掍綋淇℃伅
         navigator.mediaSession.metadata = new MediaMetadata({
-            title: song.name || '未知歌曲',
+            title: song.name || '鏈煡姝屾洸',
             artist: Array.isArray(song.artist) ?
-                   song.artist.join(', ') : (song.artist || '未知艺术家'),
+                   song.artist.join(', ') : (song.artist || '鏈煡鑹烘湳瀹?),
             album: song.album || '',
             artwork: artworkList
         });
         
-        console.log('📱 锁屏媒体信息已更新', { artworkUrl: artworkList[0].src });
+        console.log('馃摫 閿佸睆濯掍綋淇℃伅宸叉洿鏂?, { artworkUrl: artworkList[0].src });
         
     } catch (error) {
-        console.warn('更新锁屏信息失败:', error);
+        console.warn('鏇存柊閿佸睆淇℃伅澶辫触:', error);
     }
 }
 
 // ================================================
-// 解锁恢复机制
+// 瑙ｉ攣鎭㈠鏈哄埗
 // ================================================
 function setupUnlockRecovery() {
-    console.log('🔓 初始化解锁恢复机制');
+    console.log('馃敁 鍒濆鍖栬В閿佹仮澶嶆満鍒?);
     
     let isRecovering = false;
     let lastUnlockTime = 0;
     
     document.addEventListener('visibilitychange', () => {
-        console.log('👀 页面可见性变化:', document.visibilityState);
+        console.log('馃憖 椤甸潰鍙鎬у彉鍖?', document.visibilityState);
         
         if (document.visibilityState === 'visible') {
-            // 刚从锁屏解锁
+            // 鍒氫粠閿佸睆瑙ｉ攣
             const now = Date.now();
             
-            // 防抖：防止短时间内多次触发
-            if (now - lastUnlockTime < 1000 || isRecovering) {
+            // 闃叉姈锛氶槻姝㈢煭鏃堕棿鍐呭娆¤Е鍙?            if (now - lastUnlockTime < 1000 || isRecovering) {
                 return;
             }
             
             lastUnlockTime = now;
             isRecovering = true;
             
-            console.log('🔓 检测到解锁，开始恢复流程...');
+            console.log('馃敁 妫€娴嬪埌瑙ｉ攣锛屽紑濮嬫仮澶嶆祦绋?..');
             
-            // 延迟执行，确保页面完全恢复
-            setTimeout(() => {
+            // 寤惰繜鎵ц锛岀‘淇濋〉闈㈠畬鍏ㄦ仮澶?            setTimeout(() => {
                 try {
                     performUnlockRecovery();
                 } catch (error) {
-                    console.error('🔓 恢复过程中出错:', error);
+                    console.error('馃敁 鎭㈠杩囩▼涓嚭閿?', error);
                 } finally {
                     isRecovering = false;
                 }
@@ -4347,62 +4308,58 @@ function setupUnlockRecovery() {
     });
 }
 
-// 执行解锁恢复
+// 鎵ц瑙ｉ攣鎭㈠
 function performUnlockRecovery() {
-    console.log('🔓 执行解锁恢复流程');
+    console.log('馃敁 鎵ц瑙ｉ攣鎭㈠娴佺▼');
     
-    // 使用 requestAnimationFrame 确保渲染帧就绪
-    requestAnimationFrame(() => {
+    // 浣跨敤 requestAnimationFrame 纭繚娓叉煋甯у氨缁?    requestAnimationFrame(() => {
         try {
-            // === 恢复1：延迟的UI更新 ===
+            // === 鎭㈠1锛氬欢杩熺殑UI鏇存柊 ===
             if (state.pendingStealthUpdate) {
-                console.log('🔓 恢复延迟的UI更新');
+                console.log('馃敁 鎭㈠寤惰繜鐨刄I鏇存柊');
                 
                 const { song, timestamp, shouldLoadArtwork, shouldUpdateBackground, shouldLoadLyrics } = 
                     state.pendingStealthUpdate;
                 
-                // 检查是否过期（超过60秒的更新丢弃）
-                if (Date.now() - timestamp < 60000) {
-                    // 补全之前跳过的 UI 更新
+                // 妫€鏌ユ槸鍚﹁繃鏈燂紙瓒呰繃60绉掔殑鏇存柊涓㈠純锛?                if (Date.now() - timestamp < 60000) {
+                    // 琛ュ叏涔嬪墠璺宠繃鐨?UI 鏇存柊
                     updateCurrentSongInfo(song, {
                         loadArtwork: shouldLoadArtwork,
                         updateBackground: shouldUpdateBackground
                     });
                     
-                    // 补全歌词
+                    // 琛ュ叏姝岃瘝
                     if (shouldLoadLyrics) {
                         loadLyrics(song);
                     }
                     
-                    console.log('✅ UI恢复完成');
+                    console.log('鉁?UI鎭㈠瀹屾垚');
                 } else {
-                    console.log('⏰ 延迟更新已过期，跳过');
+                    console.log('鈴?寤惰繜鏇存柊宸茶繃鏈燂紝璺宠繃');
                 }
                 
-                // 清理标记
+                // 娓呯悊鏍囪
                 state.pendingStealthUpdate = null;
                 state.needUpdateOnUnlock = false;
             }
             
-            // === 恢复2：音频状态检查和修复 ===
+            // === 鎭㈠2锛氶煶棰戠姸鎬佹鏌ュ拰淇 ===
             const player = dom.audioPlayer;
             if (player && player.src) {
-                console.log('🔓 检查音频状态:', {
+                console.log('馃敁 妫€鏌ラ煶棰戠姸鎬?', {
                     paused: player.paused,
                     currentTime: player.currentTime,
                     volume: player.volume,
                     muted: player.muted
                 });
                 
-                // 如果音频应该在播放但可能有问题
-                if (!player.paused) {
-                    // 检查是否需要音频修复
-                    if (player.volume > 0 && !player.muted) {
-                        // 音频可能没声音，尝试修复
+                // 濡傛灉闊抽搴旇鍦ㄦ挱鏀句絾鍙兘鏈夐棶棰?                if (!player.paused) {
+                    // 妫€鏌ユ槸鍚﹂渶瑕侀煶棰戜慨澶?                    if (player.volume > 0 && !player.muted) {
+                        // 闊抽鍙兘娌″０闊筹紝灏濊瘯淇
                         fixAudioOutputIfNeeded();
                     }
                     
-                    // 强制更新一次进度条
+                    // 寮哄埗鏇存柊涓€娆¤繘搴︽潯
                     const currentTime = player.currentTime || 0;
                     const duration = player.duration || Number(dom.progressBar.max) || 0;
                     
@@ -4412,81 +4369,80 @@ function performUnlockRecovery() {
                 }
             }
             
-            // === 恢复3：UI元素刷新 ===
-            // 刷新播放按钮
+            // === 鎭㈠3锛歎I鍏冪礌鍒锋柊 ===
+            // 鍒锋柊鎾斁鎸夐挳
             updatePlayPauseButton();
             
-            // 刷新收藏图标
+            // 鍒锋柊鏀惰棌鍥炬爣
             updateFavoriteIcons();
             
-            // 刷新播放列表高亮
+            // 鍒锋柊鎾斁鍒楄〃楂樹寒
             if (state.currentPlaylist === "playlist") {
                 updatePlaylistHighlight();
             }
             
-            // 刷新收藏列表高亮
+            // 鍒锋柊鏀惰棌鍒楄〃楂樹寒
             if (state.currentList === "favorite") {
                 updateFavoriteHighlight();
             }
             
-            console.log('🔓 解锁恢复流程完成');
+            console.log('馃敁 瑙ｉ攣鎭㈠娴佺▼瀹屾垚');
             
         } catch (error) {
-            console.error('🔓 恢复过程中出错:', error);
+            console.error('馃敁 鎭㈠杩囩▼涓嚭閿?', error);
         }
     });
 }
 
-// 修复音频输出
+// 淇闊抽杈撳嚭
 function fixAudioOutputIfNeeded() {
     const player = dom.audioPlayer;
     if (!player || !player.src || player.paused) return;
     
-    console.log('🔓 尝试修复音频输出');
+    console.log('馃敁 灏濊瘯淇闊抽杈撳嚭');
     
     try {
         const currentTime = player.currentTime;
         const currentVolume = player.volume;
         
-        // 方法：暂停 -> 微调时间 -> 重新播放
+        // 鏂规硶锛氭殏鍋?-> 寰皟鏃堕棿 -> 閲嶆柊鎾斁
         player.pause();
         
         setTimeout(() => {
-            // 微调时间，强制硬件重同步
+            // 寰皟鏃堕棿锛屽己鍒剁‖浠堕噸鍚屾
             player.currentTime = Math.max(0, currentTime + 0.001);
             player.volume = currentVolume;
             
             player.play().then(() => {
-                console.log('✅ 音频输出修复成功');
+                console.log('鉁?闊抽杈撳嚭淇鎴愬姛');
             }).catch(e => {
-                console.warn('音频输出修复失败:', e);
+                console.warn('闊抽杈撳嚭淇澶辫触:', e);
             });
         }, 50);
         
     } catch (error) {
-        console.error('音频修复异常:', error);
+        console.error('闊抽淇寮傚父:', error);
     }
 }
 
-// 修复：更新当前歌曲信息和封面
+// 淇锛氭洿鏂板綋鍓嶆瓕鏇蹭俊鎭拰灏侀潰
 function updateCurrentSongInfo(song, options = {}) {
     const { loadArtwork = true, updateBackground = true } = options;
     
-    // 如果是隐身模式，跳过UI更新
+    // 濡傛灉鏄殣韬ā寮忥紝璺宠繃UI鏇存柊
     if (shouldUseStealthMode() && !state.forceUIUpdate) {
-        console.log('🔒 隐身模式：跳过UI更新');
+        console.log('馃敀 闅愯韩妯″紡锛氳烦杩嘦I鏇存柊');
         return Promise.resolve();
     }
     
-    // 只有在 updateBackground 为 true 时才更新当前歌曲状态
-    if (updateBackground) {
+    // 鍙湁鍦?updateBackground 涓?true 鏃舵墠鏇存柊褰撳墠姝屾洸鐘舵€?    if (updateBackground) {
         state.currentSong = song;
         dom.currentSongTitle.textContent = song.name;
         updateMobileToolbarTitle();
         updateFavoriteIcons();
 
-        // 修复艺人名称显示问题 - 使用正确的字段名
-        const artistText = Array.isArray(song.artist) ? song.artist.join(', ') : (song.artist || '未知艺术家');
+        // 淇鑹轰汉鍚嶇О鏄剧ず闂 - 浣跨敤姝ｇ‘鐨勫瓧娈靛悕
+        const artistText = Array.isArray(song.artist) ? song.artist.join(', ') : (song.artist || '鏈煡鑹烘湳瀹?);
         dom.currentSongArtist.textContent = artistText;
     }
 
@@ -4501,14 +4457,14 @@ function updateCurrentSongInfo(song, options = {}) {
         return Promise.resolve();
     }
 
-    // 加载封面
+    // 鍔犺浇灏侀潰
     if (song.pic_id || song.id) {
         cancelDeferredPaletteUpdate();
         dom.albumCover.classList.add("loading");
         const picUrl = API.getPicUrl(song);
         
-        // 直接使用图片URL，不通过JSON解析
-        debugLog(`直接使用封面URL: ${picUrl}`);
+        // 鐩存帴浣跨敤鍥剧墖URL锛屼笉閫氳繃JSON瑙ｆ瀽
+        debugLog(`鐩存帴浣跨敤灏侀潰URL: ${picUrl}`);
         
         const preferredImageUrl = preferHttpsUrl(picUrl);
         const absoluteImageUrl = toAbsoluteUrl(preferredImageUrl);
@@ -4520,17 +4476,17 @@ function updateCurrentSongInfo(song, options = {}) {
             }
         }
         
-        // 针对QQ音乐的封面加载优化（酷我音乐已禁用）
+        // 閽堝QQ闊充箰鐨勫皝闈㈠姞杞戒紭鍖栵紙閰锋垜闊充箰宸茬鐢級
         const isSlowSource = song.source === 'qq';
         const loadTimeout = isSlowSource ? 8000 : 3000;
         
-        // 优化图片加载，添加超时处理和重试机制
+        // 浼樺寲鍥剧墖鍔犺浇锛屾坊鍔犺秴鏃跺鐞嗗拰閲嶈瘯鏈哄埗
         const loadImageWithTimeout = (url, timeout) => {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 let timeoutId;
                 
-                // 移除crossOrigin属性，避免跨域问题
+                // 绉婚櫎crossOrigin灞炴€э紝閬垮厤璺ㄥ煙闂
                 
                 img.onload = () => {
                     clearTimeout(timeoutId);
@@ -4539,13 +4495,12 @@ function updateCurrentSongInfo(song, options = {}) {
                 
                 img.onerror = () => {
                     clearTimeout(timeoutId);
-                    // 直接拒绝，不尝试no-cors模式，因为我们不需要访问图片数据
-                    reject(new Error('Image load failed'));
+                    // 鐩存帴鎷掔粷锛屼笉灏濊瘯no-cors妯″紡锛屽洜涓烘垜浠笉闇€瑕佽闂浘鐗囨暟鎹?                    reject(new Error('Image load failed'));
                 };
                 
-                // 设置超时
+                // 璁剧疆瓒呮椂
                 timeoutId = setTimeout(() => {
-                    img.src = ''; // 取消图片加载
+                    img.src = ''; // 鍙栨秷鍥剧墖鍔犺浇
                     reject(new Error(`Image load timed out after ${timeout}ms`));
                 }, timeout);
                 
@@ -4553,7 +4508,7 @@ function updateCurrentSongInfo(song, options = {}) {
             });
         };
         
-        // 尝试加载图片，带重试机制
+        // 灏濊瘯鍔犺浇鍥剧墖锛屽甫閲嶈瘯鏈哄埗
         const loadImage = async () => {
             const maxRetries = isSlowSource ? 2 : 1;
             let retryCount = 0;
@@ -4564,16 +4519,15 @@ function updateCurrentSongInfo(song, options = {}) {
                     
                     if (state.currentSong === song && updateBackground) {
                         setAlbumCoverImage(preferredImageUrl);
-                        // 优化：总是立即应用调色板，加快视觉效果
+                        // 浼樺寲锛氭€绘槸绔嬪嵆搴旂敤璋冭壊鏉匡紝鍔犲揩瑙嗚鏁堟灉
                         scheduleDeferredPaletteUpdate(preferredImageUrl, { immediate: true });
                     }
                     return;
                 } catch (error) {
                     retryCount++;
-                    debugLog(`封面加载失败，重试 ${retryCount}/${maxRetries}: ${error.message}`);
+                    debugLog(`灏侀潰鍔犺浇澶辫触锛岄噸璇?${retryCount}/${maxRetries}: ${error.message}`);
                     
-                    // 最后一次尝试失败，显示占位符
-                    if (retryCount >= maxRetries) {
+                    // 鏈€鍚庝竴娆″皾璇曞け璐ワ紝鏄剧ず鍗犱綅绗?                    if (retryCount >= maxRetries) {
                         if (state.currentSong === song && updateBackground) {
                             cancelDeferredPaletteUpdate();
                             showAlbumCoverPlaceholder();
@@ -4594,11 +4548,10 @@ function updateCurrentSongInfo(song, options = {}) {
     return Promise.resolve();
 }
 
-// 搜索功能 - 修复搜索下拉框显示问题
-async function performSearch(isLiveSearch = false) {
+// 鎼滅储鍔熻兘 - 淇鎼滅储涓嬫媺妗嗘樉绀洪棶棰?async function performSearch(isLiveSearch = false) {
     const query = dom.searchInput.value.trim();
     if (!query) {
-        showNotification("请输入搜索关键词", "error");
+        showNotification("璇疯緭鍏ユ悳绱㈠叧閿瘝", "error");
         return;
     }
 
@@ -4612,8 +4565,7 @@ async function performSearch(isLiveSearch = false) {
     updateSourceLabel();
     buildSourceMenu();
 
-    // 重置搜索状态
-    if (!isLiveSearch) {
+    // 閲嶇疆鎼滅储鐘舵€?    if (!isLiveSearch) {
         state.searchPage = 1;
         state.searchKeyword = query;
         state.searchSource = source;
@@ -4625,24 +4577,23 @@ async function performSearch(isLiveSearch = false) {
         if (listContainer) {
             listContainer.innerHTML = "";
         }
-        debugLog(`开始新搜索: ${query}, 来源: ${source}`);
+        debugLog(`寮€濮嬫柊鎼滅储: ${query}, 鏉ユ簮: ${source}`);
     } else {
         state.searchKeyword = query;
         state.searchSource = source;
     }
 
     try {
-        // 禁用搜索按钮并显示加载状态
-        dom.searchBtn.disabled = true;
-        dom.searchBtn.innerHTML = '<span class="loader"></span><span>搜索中...</span>';
+        // 绂佺敤鎼滅储鎸夐挳骞舵樉绀哄姞杞界姸鎬?        dom.searchBtn.disabled = true;
+        dom.searchBtn.innerHTML = '<span class="loader"></span><span>鎼滅储涓?..</span>';
 
-        // 立即显示搜索模式
+        // 绔嬪嵆鏄剧ず鎼滅储妯″紡
         showSearchResults();
-        debugLog("已切换到搜索模式");
+        debugLog("宸插垏鎹㈠埌鎼滅储妯″紡");
 
-        // 执行搜索
+        // 鎵ц鎼滅储
         const results = await API.search(query, source, 20, state.searchPage);
-        debugLog(`API返回结果数量: ${results.length}`);
+        debugLog(`API杩斿洖缁撴灉鏁伴噺: ${results.length}`);
 
         if (state.searchPage === 1) {
             state.searchResults = results;
@@ -4652,51 +4603,49 @@ async function performSearch(isLiveSearch = false) {
 
         state.hasMoreResults = results.length === 20;
 
-        // 显示搜索结果
+        // 鏄剧ず鎼滅储缁撴灉
         displaySearchResults(results, {
             reset: state.searchPage === 1,
             totalCount: state.searchResults.length,
         });
         persistLastSearchState();
-        debugLog(`搜索完成: 总共显示 ${state.searchResults.length} 个结果`);
+        debugLog(`鎼滅储瀹屾垚: 鎬诲叡鏄剧ず ${state.searchResults.length} 涓粨鏋渀);
 
-        // 如果没有结果，显示更友好的提示信息
-        if (state.searchResults.length === 0) {
+        // 濡傛灉娌℃湁缁撴灉锛屾樉绀烘洿鍙嬪ソ鐨勬彁绀轰俊鎭?        if (state.searchResults.length === 0) {
             const platformName = SOURCE_OPTIONS.find(option => option.value === source)?.label || source;
-            showNotification(`${platformName} 未找到相关歌曲，请尝试其他平台或关键词`, "info");
+            showNotification(`${platformName} 鏈壘鍒扮浉鍏虫瓕鏇诧紝璇峰皾璇曞叾浠栧钩鍙版垨鍏抽敭璇峘, "info");
         }
 
     } catch (error) {
-        console.error("搜索失败:", error);
-        showNotification("搜索失败，请稍后重试", "error");
+        console.error("鎼滅储澶辫触:", error);
+        showNotification("鎼滅储澶辫触锛岃绋嶅悗閲嶈瘯", "error");
         hideSearchResults();
-        debugLog(`搜索失败: ${error.message}`);
+        debugLog(`鎼滅储澶辫触: ${error.message}`);
     } finally {
-        // 恢复搜索按钮状态
-        dom.searchBtn.disabled = false;
-        dom.searchBtn.innerHTML = '<i class="fas fa-search"></i><span>搜索</span>';
+        // 鎭㈠鎼滅储鎸夐挳鐘舵€?        dom.searchBtn.disabled = false;
+        dom.searchBtn.innerHTML = '<i class="fas fa-search"></i><span>鎼滅储</span>';
     }
 }
 
-// 加载更多搜索结果
+// 鍔犺浇鏇村鎼滅储缁撴灉
 async function loadMoreResults() {
     if (!state.hasMoreResults || !state.searchKeyword) {
-        debugLog("没有更多结果或搜索关键词为空");
+        debugLog("娌℃湁鏇村缁撴灉鎴栨悳绱㈠叧閿瘝涓虹┖");
         return;
     }
 
     const loadMoreBtn = document.getElementById("loadMoreBtn");
     if (!loadMoreBtn) {
-        debugLog("找不到加载更多按钮");
+        debugLog("鎵句笉鍒板姞杞芥洿澶氭寜閽?);
         return;
     }
 
     try {
         loadMoreBtn.disabled = true;
-        loadMoreBtn.innerHTML = '<span class="loader"></span><span>加载中...</span>';
+        loadMoreBtn.innerHTML = '<span class="loader"></span><span>鍔犺浇涓?..</span>';
 
         state.searchPage++;
-        debugLog(`加载第 ${state.searchPage} 页结果`);
+        debugLog(`鍔犺浇绗?${state.searchPage} 椤电粨鏋渀);
 
         const source = normalizeSource(state.searchSource);
         state.searchSource = source;
@@ -4710,29 +4659,28 @@ async function loadMoreResults() {
                 totalCount: state.searchResults.length,
             });
             persistLastSearchState();
-            debugLog(`加载完成: 新增 ${results.length} 个结果`);
+            debugLog(`鍔犺浇瀹屾垚: 鏂板 ${results.length} 涓粨鏋渀);
         } else {
             state.hasMoreResults = false;
-            showNotification("没有更多结果了");
-            debugLog("没有更多结果");
+            showNotification("娌℃湁鏇村缁撴灉浜?);
+            debugLog("娌℃湁鏇村缁撴灉");
         }
     } catch (error) {
-        console.error("加载更多失败:", error);
-        showNotification("加载失败，请稍后重试", "error");
-        state.searchPage--; // 回退页码
+        console.error("鍔犺浇鏇村澶辫触:", error);
+        showNotification("鍔犺浇澶辫触锛岃绋嶅悗閲嶈瘯", "error");
+        state.searchPage--; // 鍥為€€椤电爜
     } finally {
         if (loadMoreBtn) {
             loadMoreBtn.disabled = false;
-            loadMoreBtn.innerHTML = "<i class=\"fas fa-plus\"></i><span>加载更多</span>";
+            loadMoreBtn.innerHTML = "<i class=\"fas fa-plus\"></i><span>鍔犺浇鏇村</span>";
         }
     }
 }
 
-// 获取歌曲来源简称
-function getSourceShortName(source) {
+// 鑾峰彇姝屾洸鏉ユ簮绠€绉?function getSourceShortName(source) {
     const sourceMap = {
-        'netease': '网易',
-        'kuwo': '酷我',
+        'netease': '缃戞槗',
+        'kuwo': '閰锋垜',
         'qq': 'QQ'
     };
     return sourceMap[source] || '';
@@ -4758,13 +4706,13 @@ function createSearchResultItem(song, index) {
 
     const title = document.createElement("div");
     title.className = "search-result-title";
-    title.textContent = song.name || "未知歌曲";
+    title.textContent = song.name || "鏈煡姝屾洸";
 
     const artist = document.createElement("div");
     artist.className = "search-result-artist";
     const artistName = Array.isArray(song.artist)
         ? song.artist.join(', ')
-        : (song.artist || "未知艺术家");
+        : (song.artist || "鏈煡鑹烘湳瀹?);
     const albumText = song.album ? ` - ${song.album}` : "";
     artist.textContent = `${artistName}${albumText}`;
 
@@ -4777,7 +4725,7 @@ function createSearchResultItem(song, index) {
     const favoriteButton = document.createElement("button");
     favoriteButton.className = "action-btn favorite favorite-toggle";
     favoriteButton.type = "button";
-    favoriteButton.title = "收藏";
+    favoriteButton.title = "鏀惰棌";
     favoriteButton.dataset.favoriteKey = getSongKey(song) || `search-${index}`;
     favoriteButton.innerHTML = '<i class="far fa-heart"></i>';
     favoriteButton.addEventListener("click", (event) => {
@@ -4788,7 +4736,7 @@ function createSearchResultItem(song, index) {
     const playButton = document.createElement("button");
     playButton.className = "action-btn play";
     playButton.type = "button";
-    playButton.title = "播放";
+    playButton.title = "鎾斁";
     playButton.innerHTML = '<i class="fas fa-play"></i>';
     playButton.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -4798,7 +4746,7 @@ function createSearchResultItem(song, index) {
     const downloadButton = document.createElement("button");
     downloadButton.className = "action-btn download";
     downloadButton.type = "button";
-    downloadButton.title = "下载";
+    downloadButton.title = "涓嬭浇";
     downloadButton.innerHTML = '<i class="fas fa-download"></i>';
     downloadButton.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -4842,7 +4790,7 @@ function applySelectionStateToElement(item, isSelected) {
     const toggle = item.querySelector(".search-result-select");
     if (toggle) {
         toggle.setAttribute("aria-pressed", isSelected ? "true" : "false");
-        toggle.setAttribute("aria-label", isSelected ? "取消选择" : "选择歌曲");
+        toggle.setAttribute("aria-label", isSelected ? "鍙栨秷閫夋嫨" : "閫夋嫨姝屾洸");
     }
 }
 
@@ -4873,9 +4821,9 @@ function updateImportSelectedButton() {
     if (countLabel) {
         countLabel.textContent = count > 0 ? `(${count})` : "";
     }
-    const label = count > 0 ? `导入已选 (${count})` : "导入已选";
+    const label = count > 0 ? `瀵煎叆宸查€?(${count})` : "瀵煎叆宸查€?;
     button.title = label;
-    button.setAttribute("aria-label", count > 0 ? `导入已选 ${count} 首歌曲` : "导入已选");
+    button.setAttribute("aria-label", count > 0 ? `瀵煎叆宸查€?${count} 棣栨瓕鏇瞏 : "瀵煎叆宸查€?);
 }
 
 function toggleSearchResultSelection(index) {
@@ -4960,7 +4908,7 @@ function importSelectedSearchResults(target = "playlist") {
 
     if (songsToAdd.length === 0) {
         resetSelectedSearchResults();
-        showNotification("未找到可导入的歌曲", "warning");
+        showNotification("鏈壘鍒板彲瀵煎叆鐨勬瓕鏇?, "warning");
         return;
     }
 
@@ -4997,11 +4945,11 @@ function importSelectedSearchResults(target = "playlist") {
         if (added > 0) {
             saveFavoriteState();
             renderFavorites();
-            const duplicateHint = duplicates > 0 ? `，${duplicates} 首已存在` : "";
-            showNotification(`成功导入 ${added} 首收藏歌曲${duplicateHint}`, "success");
+            const duplicateHint = duplicates > 0 ? `锛?{duplicates} 棣栧凡瀛樺湪` : "";
+            showNotification(`鎴愬姛瀵煎叆 ${added} 棣栨敹钘忔瓕鏇?{duplicateHint}`, "success");
         } else {
             updateFavoriteActionStates();
-            showNotification("选中的歌曲已在收藏列表中", "warning");
+            showNotification("閫変腑鐨勬瓕鏇插凡鍦ㄦ敹钘忓垪琛ㄤ腑", "warning");
         }
         updateFavoriteIcons();
         return;
@@ -5035,11 +4983,11 @@ function importSelectedSearchResults(target = "playlist") {
 
     if (added > 0) {
         renderPlaylist();
-        const duplicateHint = duplicates > 0 ? `，${duplicates} 首已存在` : "";
-        showNotification(`成功导入 ${added} 首歌曲${duplicateHint}`, "success");
+        const duplicateHint = duplicates > 0 ? `锛?{duplicates} 棣栧凡瀛樺湪` : "";
+        showNotification(`鎴愬姛瀵煎叆 ${added} 棣栨瓕鏇?{duplicateHint}`, "success");
     } else {
         updatePlaylistActionStates();
-        showNotification("选中的歌曲已在播放列表中", "warning");
+        showNotification("閫変腑鐨勬瓕鏇插凡鍦ㄦ挱鏀惧垪琛ㄤ腑", "warning");
     }
     updateFavoriteIcons();
 }
@@ -5049,7 +4997,7 @@ function createLoadMoreButton() {
     button.id = "loadMoreBtn";
     button.className = "load-more-btn";
     button.type = "button";
-    button.innerHTML = '<i class="fas fa-plus"></i><span>加载更多</span>';
+    button.innerHTML = '<i class="fas fa-plus"></i><span>鍔犺浇鏇村</span>';
     button.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -5081,9 +5029,9 @@ function displaySearchResults(newItems, options = {}) {
     const itemsToAppend = Array.isArray(newItems) ? newItems : [];
 
     if (itemsToAppend.length === 0 && state.renderedSearchCount === 0 && totalCount === 0) {
-        container.innerHTML = "<div style=\"text-align: center; color: var(--text-secondary-color); padding: 20px;\">未找到相关歌曲</div>";
+        container.innerHTML = "<div style=\"text-align: center; color: var(--text-secondary-color); padding: 20px;\">鏈壘鍒扮浉鍏虫瓕鏇?/div>";
         state.renderedSearchCount = 0;
-        debugLog("显示搜索结果: 0 个结果, 无可用数据");
+        debugLog("鏄剧ず鎼滅储缁撴灉: 0 涓粨鏋? 鏃犲彲鐢ㄦ暟鎹?);
         return;
     }
 
@@ -5103,32 +5051,31 @@ function displaySearchResults(newItems, options = {}) {
 
     const appendedCount = itemsToAppend.length;
     const totalRendered = state.renderedSearchCount;
-    debugLog(`显示搜索结果: 新增 ${appendedCount} 个结果, 总计 ${totalRendered} 个, 加载更多按钮: ${state.hasMoreResults ? "显示" : "隐藏"}`);
+    debugLog(`鏄剧ず鎼滅储缁撴灉: 鏂板 ${appendedCount} 涓粨鏋? 鎬昏 ${totalRendered} 涓? 鍔犺浇鏇村鎸夐挳: ${state.hasMoreResults ? "鏄剧ず" : "闅愯棌"}`);
     updateFavoriteIcons();
 }
 
-// 显示质量选择菜单
+// 鏄剧ず璐ㄩ噺閫夋嫨鑿滃崟
 function showQualityMenu(event, index, type) {
     event.stopPropagation();
-    console.log('🍽️ showQualityMenu调用:', index, type);
+    console.log('馃嵔锔?showQualityMenu璋冪敤:', index, type);
 
-    // 移除现有的质量菜单
-    const existingMenu = document.querySelector(".dynamic-quality-menu");
+    // 绉婚櫎鐜版湁鐨勮川閲忚彍鍗?    const existingMenu = document.querySelector(".dynamic-quality-menu");
     if (existingMenu) {
         existingMenu.remove();
     }
 
-    // 创建新的质量菜单
+    // 鍒涘缓鏂扮殑璐ㄩ噺鑿滃崟
     const menu = document.createElement("div");
     menu.className = "dynamic-quality-menu";
-    // 支持多种音质选项，包括flac24bit
+    // 鏀寔澶氱闊宠川閫夐」锛屽寘鎷琭lac24bit
     menu.innerHTML = `
-        <div class="quality-option" onclick="downloadWithQuality(event, ${index}, '${type}', 'mp3')">MP3音质</div>
-        <div class="quality-option" onclick="downloadWithQuality(event, ${index}, '${type}', 'flac')">无损音质 FLAC</div>
-        <div class="quality-option" onclick="downloadWithQuality(event, ${index}, '${type}', 'flac24bit')">Hi-Res音质 FLAC24bit</div>
+        <div class="quality-option" onclick="downloadWithQuality(event, ${index}, '${type}', 'mp3')">MP3闊宠川</div>
+        <div class="quality-option" onclick="downloadWithQuality(event, ${index}, '${type}', 'flac')">鏃犳崯闊宠川 FLAC</div>
+        <div class="quality-option" onclick="downloadWithQuality(event, ${index}, '${type}', 'flac24bit')">Hi-Res闊宠川 FLAC24bit</div>
     `;
 
-    // 设置菜单位置
+    // 璁剧疆鑿滃崟浣嶇疆
     const button = event.target.closest("button");
     const rect = button.getBoundingClientRect();
     menu.style.position = "fixed";
@@ -5136,11 +5083,11 @@ function showQualityMenu(event, index, type) {
     menu.style.left = (rect.left - 50) + "px";
     menu.style.zIndex = "10000";
 
-    // 添加到body
+    // 娣诲姞鍒癰ody
     document.body.appendChild(menu);
-    console.log('🍽️ 质量菜单已创建，HTML:', menu.innerHTML);
+    console.log('馃嵔锔?璐ㄩ噺鑿滃崟宸插垱寤猴紝HTML:', menu.innerHTML);
 
-    // 点击其他地方关闭菜单
+    // 鐐瑰嚮鍏朵粬鍦版柟鍏抽棴鑿滃崟
     setTimeout(() => {
         document.addEventListener("click", function closeMenu(e) {
             if (!menu.contains(e.target)) {
@@ -5151,7 +5098,7 @@ function showQualityMenu(event, index, type) {
     }, 0);
 }
 
-// 根据质量下载 - 支持播放列表模式
+// 鏍规嵁璐ㄩ噺涓嬭浇 - 鏀寔鎾斁鍒楄〃妯″紡
 async function downloadWithQuality(event, index, type, quality) {
     event.stopPropagation();
     let song;
@@ -5168,69 +5115,63 @@ async function downloadWithQuality(event, index, type, quality) {
 
     if (!song) return;
 
-    // 关闭菜单并移除 menu-active 类
-    document.querySelectorAll(".quality-menu").forEach(menu => {
+    // 鍏抽棴鑿滃崟骞剁Щ闄?menu-active 绫?    document.querySelectorAll(".quality-menu").forEach(menu => {
         menu.classList.remove("show");
         const parentItem = menu.closest(".search-result-item");
         if (parentItem) parentItem.classList.remove("menu-active");
     });
 
-    // 关闭动态质量菜单
-    const dynamicMenu = document.querySelector(".dynamic-quality-menu");
+    // 鍏抽棴鍔ㄦ€佽川閲忚彍鍗?    const dynamicMenu = document.querySelector(".dynamic-quality-menu");
     if (dynamicMenu) {
         dynamicMenu.remove();
     }
 
     try {
-        // 正确传递质量参数
-        await downloadSong(song, quality);
+        // 姝ｇ‘浼犻€掕川閲忓弬鏁?        await downloadSong(song, quality);
     } catch (error) {
-        console.error("下载失败:", error);
-        showNotification("下载失败，请稍后重试", "error");
+        console.error("涓嬭浇澶辫触:", error);
+        showNotification("涓嬭浇澶辫触锛岃绋嶅悗閲嶈瘯", "error");
     }
 }
 
-// 修复：播放搜索结果 - 添加到播放列表而不是清空
-async function playSearchResult(index) {
+// 淇锛氭挱鏀炬悳绱㈢粨鏋?- 娣诲姞鍒版挱鏀惧垪琛ㄨ€屼笉鏄竻绌?async function playSearchResult(index) {
     const song = state.searchResults[index];
     if (!song) return;
 
     try {
-        // 立即隐藏搜索结果，显示播放界面
-        hideSearchResults();
+        // 绔嬪嵆闅愯棌鎼滅储缁撴灉锛屾樉绀烘挱鏀剧晫闈?        hideSearchResults();
         dom.searchInput.value = "";
         if (isMobileView) {
             closeMobileSearch();
         }
 
-        // 检查歌曲是否已在播放列表中
+        // 妫€鏌ユ瓕鏇叉槸鍚﹀凡鍦ㄦ挱鏀惧垪琛ㄤ腑
         const existingIndex = state.playlistSongs.findIndex(s => s.id === song.id && s.source === song.source);
 
         if (existingIndex !== -1) {
-            // 如果歌曲已存在，直接播放
+            // 濡傛灉姝屾洸宸插瓨鍦紝鐩存帴鎾斁
             state.currentTrackIndex = existingIndex;
             state.currentPlaylist = "playlist";
             state.currentList = "playlist";
         } else {
-            // 如果歌曲不存在，添加到播放列表
-            state.playlistSongs.push(song);
+            // 濡傛灉姝屾洸涓嶅瓨鍦紝娣诲姞鍒版挱鏀惧垪琛?            state.playlistSongs.push(song);
             state.currentTrackIndex = state.playlistSongs.length - 1;
             state.currentPlaylist = "playlist";
             state.currentList = "playlist";
         }
 
-        // 更新播放列表显示
+        // 鏇存柊鎾斁鍒楄〃鏄剧ず
         renderPlaylist();
 
-        // 播放歌曲
+        // 鎾斁姝屾洸
         await playSong(song);
         updatePlayModeUI();
 
-        showNotification(`正在播放: ${song.name}`);
+        showNotification(`姝ｅ湪鎾斁: ${song.name}`);
 
     } catch (error) {
-        console.error("播放失败:", error);
-        showNotification("播放失败，请稍后重试", "error");
+        console.error("鎾斁澶辫触:", error);
+        showNotification("鎾斁澶辫触锛岃绋嶅悗閲嶈瘯", "error");
     }
 }
 
@@ -5400,7 +5341,7 @@ function updatePlaylistActionStates() {
 
 function exportPlaylist() {
     if (!Array.isArray(state.playlistSongs) || state.playlistSongs.length === 0) {
-        showNotification("播放列表为空，无法导出", "warning");
+        showNotification("鎾斁鍒楄〃涓虹┖锛屾棤娉曞鍑?, "warning");
         return;
     }
 
@@ -5426,10 +5367,10 @@ function exportPlaylist() {
         anchor.click();
         document.body.removeChild(anchor);
         URL.revokeObjectURL(url);
-        showNotification(`已导出 ${state.playlistSongs.length} 首歌曲`, "success");
+        showNotification(`宸插鍑?${state.playlistSongs.length} 棣栨瓕鏇瞏, "success");
     } catch (error) {
-        console.error("导出播放列表失败:", error);
-        showNotification("导出失败，请稍后重试", "error");
+        console.error("瀵煎嚭鎾斁鍒楄〃澶辫触:", error);
+        showNotification("瀵煎嚭澶辫触锛岃绋嶅悗閲嶈瘯", "error");
     }
 }
 
@@ -5504,14 +5445,14 @@ function handleImportPlaylistChange(event) {
 
             const { added, duplicates } = handleImportedPlaylistItems(items);
             if (added > 0) {
-                const duplicateHint = duplicates > 0 ? `，${duplicates} 首已存在` : "";
-                showNotification(`成功导入 ${added} 首歌曲${duplicateHint}`, "success");
+                const duplicateHint = duplicates > 0 ? `锛?{duplicates} 棣栧凡瀛樺湪` : "";
+                showNotification(`鎴愬姛瀵煎叆 ${added} 棣栨瓕鏇?{duplicateHint}`, "success");
             } else {
-                showNotification("文件中的歌曲已在播放列表中", "warning");
+                showNotification("鏂囦欢涓殑姝屾洸宸插湪鎾斁鍒楄〃涓?, "warning");
             }
         } catch (error) {
-            console.error("导入播放列表失败:", error);
-            showNotification("导入失败，请确认文件格式", "error");
+            console.error("瀵煎叆鎾斁鍒楄〃澶辫触:", error);
+            showNotification("瀵煎叆澶辫触锛岃纭鏂囦欢鏍煎紡", "error");
         } finally {
             if (input) {
                 input.value = "";
@@ -5520,8 +5461,8 @@ function handleImportPlaylistChange(event) {
     };
 
     reader.onerror = () => {
-        console.error("读取播放列表文件失败:", reader.error);
-        showNotification("无法读取播放列表文件", "error");
+        console.error("璇诲彇鎾斁鍒楄〃鏂囦欢澶辫触:", reader.error);
+        showNotification("鏃犳硶璇诲彇鎾斁鍒楄〃鏂囦欢", "error");
         if (input) {
             input.value = "";
         }
@@ -5530,7 +5471,7 @@ function handleImportPlaylistChange(event) {
     reader.readAsText(file, "utf-8");
 }
 
-// 新增：渲染统一播放列表
+// 鏂板锛氭覆鏌撶粺涓€鎾斁鍒楄〃
 function renderPlaylist() {
     if (!dom.playlistItems) return;
 
@@ -5549,20 +5490,20 @@ function renderPlaylist() {
     const playlistHtml = state.playlistSongs.map((song, index) => {
         const artistValue = Array.isArray(song.artist)
             ? song.artist.join(", ")
-            : (song.artist || "未知艺术家");
+            : (song.artist || "鏈煡鑹烘湳瀹?);
         const songKey = getSongKey(song) || `playlist-${index}`;
         const sourceShortName = getSourceShortName(song.source);
         const songNameWithSource = sourceShortName ? `[${sourceShortName}] ${song.name}` : song.name;
         return `
-        <div class="playlist-item" data-index="${index}" role="button" tabindex="0" aria-label="播放 ${song.name}" data-favorite-key="${songKey}">
+        <div class="playlist-item" data-index="${index}" role="button" tabindex="0" aria-label="鎾斁 ${song.name}" data-favorite-key="${songKey}">
             ${songNameWithSource} - ${artistValue}
-            <button class="playlist-item-favorite action-btn favorite favorite-toggle" type="button" data-playlist-action="favorite" data-index="${index}" data-favorite-key="${songKey}" title="收藏" aria-label="收藏">
+            <button class="playlist-item-favorite action-btn favorite favorite-toggle" type="button" data-playlist-action="favorite" data-index="${index}" data-favorite-key="${songKey}" title="鏀惰棌" aria-label="鏀惰棌">
                 <i class="fa-regular fa-heart"></i>
             </button>
-            <button class="playlist-item-download" type="button" data-playlist-action="download" data-index="${index}" title="下载">
+            <button class="playlist-item-download" type="button" data-playlist-action="download" data-index="${index}" title="涓嬭浇">
                 <i class="fas fa-download"></i>
             </button>
-            <button class="playlist-item-remove" type="button" data-playlist-action="remove" data-index="${index}" title="从播放列表移除">
+            <button class="playlist-item-remove" type="button" data-playlist-action="remove" data-index="${index}" title="浠庢挱鏀惧垪琛ㄧЩ闄?>
                 <i class="fas fa-times"></i>
             </button>
         </div>`;
@@ -5614,11 +5555,11 @@ function updateFavoriteIcons() {
             icon.classList.toggle('fa-regular', !isActive);
         }
         if (isActive) {
-            button.setAttribute('title', '取消收藏');
-            button.setAttribute('aria-label', '取消收藏');
+            button.setAttribute('title', '鍙栨秷鏀惰棌');
+            button.setAttribute('aria-label', '鍙栨秷鏀惰棌');
         } else {
-            button.setAttribute('title', '收藏');
-            button.setAttribute('aria-label', '收藏');
+            button.setAttribute('title', '鏀惰棌');
+            button.setAttribute('aria-label', '鏀惰棌');
         }
     });
 
@@ -5630,7 +5571,7 @@ function updateFavoriteIcons() {
         dom.currentFavoriteToggle.setAttribute('aria-disabled', currentSong ? 'false' : 'true');
         dom.currentFavoriteToggle.classList.toggle('is-active', Boolean(isActive));
         dom.currentFavoriteToggle.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-        const label = isActive ? '取消收藏当前歌曲' : '收藏当前歌曲';
+        const label = isActive ? '鍙栨秷鏀惰棌褰撳墠姝屾洸' : '鏀惰棌褰撳墠姝屾洸';
         dom.currentFavoriteToggle.setAttribute('aria-label', label);
         dom.currentFavoriteToggle.setAttribute('title', label);
         const icon = dom.currentFavoriteToggle.querySelector('i');
@@ -5683,7 +5624,7 @@ function switchLibraryTab(target) {
     closeImportSelectedMenu();
 }
 
-// 新增：从播放列表移除歌曲
+// 鏂板锛氫粠鎾斁鍒楄〃绉婚櫎姝屾洸
 function removeFromPlaylist(index) {
     if (index < 0 || index >= state.playlistSongs.length) return;
 
@@ -5703,9 +5644,9 @@ function removeFromPlaylist(index) {
             dom.currentTimeDisplay.textContent = "00:00";
             dom.durationDisplay.textContent = "00:00";
             updateProgressBarBackground(0, 1);
-            dom.currentSongTitle.textContent = "选择一首歌曲开始播放";
+            dom.currentSongTitle.textContent = "閫夋嫨涓€棣栨瓕鏇插紑濮嬫挱鏀?;
             updateMobileToolbarTitle();
-            dom.currentSongArtist.textContent = "未知艺术家";
+            dom.currentSongArtist.textContent = "鏈煡鑹烘湳瀹?;
             showAlbumCoverPlaceholder();
             clearLyricsContent();
             if (dom.lyrics) {
@@ -5747,7 +5688,7 @@ function removeFromPlaylist(index) {
 
     updatePlaylistActionStates();
     savePlayerState();
-    showNotification("已从播放列表移除", "success");
+    showNotification("宸蹭粠鎾斁鍒楄〃绉婚櫎", "success");
     clearLyricsIfLibraryEmpty();
 }
 
@@ -5814,21 +5755,21 @@ function renderFavorites() {
     const favoritesHtml = favorites.map((song, index) => {
         const artistValue = Array.isArray(song.artist)
             ? song.artist.join(", ")
-            : (song.artist || "未知艺术家");
+            : (song.artist || "鏈煡鑹烘湳瀹?);
         const isCurrent = state.currentList === "favorite" && index === state.currentFavoriteIndex;
         const songKey = getSongKey(song) || `favorite-${index}`;
         const sourceShortName = getSourceShortName(song.source);
         const songNameWithSource = sourceShortName ? `[${sourceShortName}] ${song.name}` : song.name;
         return `
-        <div class="playlist-item${isCurrent ? " current" : ""}" data-index="${index}" role="button" tabindex="0" aria-label="播放 ${song.name}" data-favorite-key="${songKey}">
+        <div class="playlist-item${isCurrent ? " current" : ""}" data-index="${index}" role="button" tabindex="0" aria-label="鎾斁 ${song.name}" data-favorite-key="${songKey}">
             ${songNameWithSource} - ${artistValue}
-            <button class="favorite-item-action favorite-item-action--add" type="button" data-favorite-action="add" data-index="${index}" title="添加到播放列表" aria-label="添加到播放列表">
+            <button class="favorite-item-action favorite-item-action--add" type="button" data-favorite-action="add" data-index="${index}" title="娣诲姞鍒版挱鏀惧垪琛? aria-label="娣诲姞鍒版挱鏀惧垪琛?>
                 <i class="fas fa-plus"></i>
             </button>
-            <button class="favorite-item-action favorite-item-action--download" type="button" data-favorite-action="download" data-index="${index}" title="下载" aria-label="下载">
+            <button class="favorite-item-action favorite-item-action--download" type="button" data-favorite-action="download" data-index="${index}" title="涓嬭浇" aria-label="涓嬭浇">
                 <i class="fas fa-download"></i>
             </button>
-            <button class="favorite-item-action favorite-item-action--remove" type="button" data-favorite-action="remove" data-index="${index}" title="从收藏列表移除" aria-label="从收藏列表移除">
+            <button class="favorite-item-action favorite-item-action--remove" type="button" data-favorite-action="remove" data-index="${index}" title="浠庢敹钘忓垪琛ㄧЩ闄? aria-label="浠庢敹钘忓垪琛ㄧЩ闄?>
                 <i class="fas fa-trash"></i>
             </button>
         </div>`;
@@ -5892,7 +5833,7 @@ function toggleFavorite(song) {
     const normalizedSong = sanitizeImportedSong(song) || { ...song };
     const key = getSongKey(normalizedSong);
     if (!key) {
-        showNotification("无法收藏该歌曲", "error");
+        showNotification("鏃犳硶鏀惰棌璇ユ瓕鏇?, "error");
         return;
     }
 
@@ -5901,12 +5842,12 @@ function toggleFavorite(song) {
 
     if (existingIndex >= 0) {
         removeFavoriteAtIndex(existingIndex);
-        showNotification("已从收藏列表移除", "success");
+        showNotification("宸蹭粠鏀惰棌鍒楄〃绉婚櫎", "success");
     } else {
         favorites.push(normalizedSong);
         saveFavoriteState();
         renderFavorites();
-        showNotification("已添加到收藏列表", "success");
+        showNotification("宸叉坊鍔犲埌鏀惰棌鍒楄〃", "success");
     }
 }
 
@@ -5930,15 +5871,15 @@ async function playFavoriteSong(index) {
             closeMobilePanel();
         }
     } catch (error) {
-        console.error("播放收藏歌曲失败:", error);
-        showNotification("播放收藏歌曲失败", "error");
+        console.error("鎾斁鏀惰棌姝屾洸澶辫触:", error);
+        showNotification("鎾斁鏀惰棌姝屾洸澶辫触", "error");
     }
 }
 
 function addAllFavoritesToPlaylist() {
     const favorites = ensureFavoriteSongsArray();
     if (favorites.length === 0) {
-        showNotification("收藏列表为空", "warning");
+        showNotification("鏀惰棌鍒楄〃涓虹┖", "warning");
         return;
     }
 
@@ -5970,22 +5911,22 @@ function addAllFavoritesToPlaylist() {
 
     if (added > 0) {
         renderPlaylist();
-        const duplicateHint = duplicates > 0 ? `，${duplicates} 首已存在` : "";
-        showNotification(`已添加 ${added} 首收藏歌曲到播放列表${duplicateHint}`, "success");
+        const duplicateHint = duplicates > 0 ? `锛?{duplicates} 棣栧凡瀛樺湪` : "";
+        showNotification(`宸叉坊鍔?${added} 棣栨敹钘忔瓕鏇插埌鎾斁鍒楄〃${duplicateHint}`, "success");
     } else {
         updatePlaylistActionStates();
-        showNotification("收藏歌曲均已在播放列表中", "warning");
+        showNotification("鏀惰棌姝屾洸鍧囧凡鍦ㄦ挱鏀惧垪琛ㄤ腑", "warning");
     }
 }
 
 function clearFavorites() {
     const favorites = ensureFavoriteSongsArray();
     if (favorites.length === 0) {
-        showNotification("收藏列表为空", "warning");
+        showNotification("鏀惰棌鍒楄〃涓虹┖", "warning");
         return;
     }
 
-    if (!window.confirm("确定清空收藏列表吗？")) {
+    if (!window.confirm("纭畾娓呯┖鏀惰棌鍒楄〃鍚楋紵")) {
         return;
     }
 
@@ -6002,14 +5943,14 @@ function clearFavorites() {
     renderFavorites();
     updateFavoriteIcons();
     updatePlayModeUI();
-    showNotification("收藏列表已清空", "success");
+    showNotification("鏀惰棌鍒楄〃宸叉竻绌?, "success");
     clearLyricsIfLibraryEmpty();
 }
 
 function exportFavorites() {
     const favorites = ensureFavoriteSongsArray();
     if (favorites.length === 0) {
-        showNotification("收藏列表为空，无法导出", "warning");
+        showNotification("鏀惰棌鍒楄〃涓虹┖锛屾棤娉曞鍑?, "warning");
         return;
     }
 
@@ -6036,10 +5977,10 @@ function exportFavorites() {
         anchor.click();
         document.body.removeChild(anchor);
         URL.revokeObjectURL(url);
-        showNotification(`已导出 ${favorites.length} 首收藏歌曲`, "success");
+        showNotification(`宸插鍑?${favorites.length} 棣栨敹钘忔瓕鏇瞏, "success");
     } catch (error) {
-        console.error("导出收藏列表失败:", error);
-        showNotification("导出收藏列表失败", "error");
+        console.error("瀵煎嚭鏀惰棌鍒楄〃澶辫触:", error);
+        showNotification("瀵煎嚭鏀惰棌鍒楄〃澶辫触", "error");
     }
 }
 
@@ -6109,7 +6050,7 @@ function handleImportFavoritesChange(event) {
 
             const meta = payload.meta || {};
             if (meta.version && Number(meta.version) > FAVORITE_EXPORT_VERSION) {
-                console.warn("收藏列表文件版本较新，尝试兼容导入");
+                console.warn("鏀惰棌鍒楄〃鏂囦欢鐗堟湰杈冩柊锛屽皾璇曞吋瀹瑰鍏?);
             }
 
             const items = Array.isArray(payload.items)
@@ -6122,14 +6063,14 @@ function handleImportFavoritesChange(event) {
 
             const { added, duplicates } = handleImportedFavoriteItems(items);
             if (added > 0) {
-                const duplicateHint = duplicates > 0 ? `，${duplicates} 首已存在` : "";
-                showNotification(`成功导入 ${added} 首收藏歌曲${duplicateHint}`, "success");
+                const duplicateHint = duplicates > 0 ? `锛?{duplicates} 棣栧凡瀛樺湪` : "";
+                showNotification(`鎴愬姛瀵煎叆 ${added} 棣栨敹钘忔瓕鏇?{duplicateHint}`, "success");
             } else {
-                showNotification("文件中的歌曲已在收藏列表中", "warning");
+                showNotification("鏂囦欢涓殑姝屾洸宸插湪鏀惰棌鍒楄〃涓?, "warning");
             }
         } catch (error) {
-            console.error("导入收藏列表失败:", error);
-            showNotification("导入收藏列表失败，请确认文件格式", "error");
+            console.error("瀵煎叆鏀惰棌鍒楄〃澶辫触:", error);
+            showNotification("瀵煎叆鏀惰棌鍒楄〃澶辫触锛岃纭鏂囦欢鏍煎紡", "error");
         } finally {
             if (input) {
                 input.value = "";
@@ -6138,8 +6079,8 @@ function handleImportFavoritesChange(event) {
     };
 
     reader.onerror = () => {
-        console.error("读取收藏列表文件失败:", reader.error);
-        showNotification("无法读取收藏列表文件", "error");
+        console.error("璇诲彇鏀惰棌鍒楄〃鏂囦欢澶辫触:", reader.error);
+        showNotification("鏃犳硶璇诲彇鏀惰棌鍒楄〃鏂囦欢", "error");
         if (input) {
             input.value = "";
         }
@@ -6148,8 +6089,7 @@ function handleImportFavoritesChange(event) {
     reader.readAsText(file, "utf-8");
 }
 
-// 新增：清空播放列表
-function clearPlaylist() {
+// 鏂板锛氭竻绌烘挱鏀惧垪琛?function clearPlaylist() {
     if (state.playlistSongs.length === 0) return;
 
     if (state.currentPlaylist === "playlist") {
@@ -6165,9 +6105,9 @@ function clearPlaylist() {
         dom.currentTimeDisplay.textContent = "00:00";
         dom.durationDisplay.textContent = "00:00";
         updateProgressBarBackground(0, 1);
-        dom.currentSongTitle.textContent = "选择一首歌曲开始播放";
+        dom.currentSongTitle.textContent = "閫夋嫨涓€棣栨瓕鏇插紑濮嬫挱鏀?;
         updateMobileToolbarTitle();
-        dom.currentSongArtist.textContent = "未知艺术家";
+        dom.currentSongArtist.textContent = "鏈煡鑹烘湳瀹?;
         showAlbumCoverPlaceholder();
         clearLyricsContent();
         if (dom.lyrics) {
@@ -6187,12 +6127,11 @@ function clearPlaylist() {
     updatePlaylistActionStates();
 
     savePlayerState();
-    showNotification("播放列表已清空", "success");
+    showNotification("鎾斁鍒楄〃宸叉竻绌?, "success");
     clearLyricsIfLibraryEmpty();
 }
 
-// 新增：播放播放列表中的歌曲
-async function playPlaylistSong(index) {
+// 鏂板锛氭挱鏀炬挱鏀惧垪琛ㄤ腑鐨勬瓕鏇?async function playPlaylistSong(index) {
     if (index < 0 || index >= state.playlistSongs.length) return;
 
     const song = state.playlistSongs[index];
@@ -6208,13 +6147,12 @@ async function playPlaylistSong(index) {
             closeMobilePanel();
         }
     } catch (error) {
-        console.error("播放失败:", error);
-        showNotification("播放失败，请稍后重试", "error");
+        console.error("鎾斁澶辫触:", error);
+        showNotification("鎾斁澶辫触锛岃绋嶅悗閲嶈瘯", "error");
     }
 }
 
-// 新增：更新播放列表高亮
-function updatePlaylistHighlight() {
+// 鏂板锛氭洿鏂版挱鏀惧垪琛ㄩ珮浜?function updatePlaylistHighlight() {
     if (!dom.playlistItems) return;
     const playlistItems = dom.playlistItems.querySelectorAll(".playlist-item");
     playlistItems.forEach((item, index) => {
@@ -6226,16 +6164,16 @@ function updatePlaylistHighlight() {
 }
 
 // ============================================================
-// 最终核弹级修复：iOS PWA 锁屏播放函数 (v3.0 抢占式激活版)
+// 鏈€缁堟牳寮圭骇淇锛歩OS PWA 閿佸睆鎾斁鍑芥暟 (v3.0 鎶㈠崰寮忔縺娲荤増)
 // ============================================================
 // ================================================
-// iOS PWA 兼容版 playSong 函数
+// iOS PWA 鍏煎鐗?playSong 鍑芥暟
 // ================================================
 // ================================================ 
-// 🎵 辅助模块：锁屏元数据 & 音频守护 
+// 馃幍 杈呭姪妯″潡锛氶攣灞忓厓鏁版嵁 & 闊抽瀹堟姢 
 // ================================================ 
 
-// 1. 锁屏元数据更新 
+// 1. 閿佸睆鍏冩暟鎹洿鏂?
 function updateMediaMetadataForLockScreen(song) { 
     if (!('mediaSession' in navigator)) return; 
     try { 
@@ -6247,15 +6185,15 @@ function updateMediaMetadataForLockScreen(song) {
         if (!coverUrl) coverUrl = window.location.origin + '/favicon.png'; 
         
         navigator.mediaSession.metadata = new MediaMetadata({ 
-            title: song.name || '未知歌曲', 
-            artist: Array.isArray(song.artist) ? song.artist.join(', ') : (song.artist || '未知艺术家'), 
+            title: song.name || '鏈煡姝屾洸', 
+            artist: Array.isArray(song.artist) ? song.artist.join(', ') : (song.artist || '鏈煡鑹烘湳瀹?), 
             album: song.album || '', 
             artwork: [{ src: coverUrl, sizes: '512x512', type: 'image/png' }] 
         }); 
-    } catch (e) { console.warn('锁屏更新微小错误:', e); } 
+    } catch (e) { console.warn('閿佸睆鏇存柊寰皬閿欒:', e); } 
 } 
 
-// 2. 音频守护进程 (AudioGuard) 
+// 2. 闊抽瀹堟姢杩涚▼ (AudioGuard) 
 (function() { 
     if (!window.solaraAudioGuard) { 
         window.solaraAudioGuard = { 
@@ -6272,13 +6210,13 @@ function updateMediaMetadataForLockScreen(song) {
                     const gain = this.audioCtx.createGain(); 
                     this.osc.type = 'sine'; 
                     this.osc.frequency.value = 1; 
-                    gain.gain.value = 0.001; // 极低音量 
+                    gain.gain.value = 0.001; // 鏋佷綆闊抽噺 
                     this.osc.connect(gain); 
                     gain.connect(this.audioCtx.destination); 
                     this.osc.start(); 
                     this.isActive = true; 
-                    console.log('🛡️ 守护启动 (占位)'); 
-                } catch (e) { console.error('守护启动失败:', e); } 
+                    console.log('馃洝锔?瀹堟姢鍚姩 (鍗犱綅)'); 
+                } catch (e) { console.error('瀹堟姢鍚姩澶辫触:', e); } 
             }, 
             stop: function() { 
                 if (!this.isActive) return; 
@@ -6286,140 +6224,132 @@ function updateMediaMetadataForLockScreen(song) {
                     if (this.osc) { this.osc.stop(); this.osc.disconnect(); } 
                     if (this.audioCtx) { this.audioCtx.close(); } 
                     this.isActive = false; 
-                    console.log('🛡️ 守护停止 (释放通道)'); 
-                } catch (e) { console.error('守护停止失败:', e); } 
+                    console.log('馃洝锔?瀹堟姢鍋滄 (閲婃斁閫氶亾)'); 
+                } catch (e) { console.error('瀹堟姢鍋滄澶辫触:', e); } 
             } 
         }; 
     } 
 })();
 
 // ================================================
-// iOS PWA 终极版 playSong (v7.4 Ghost Fix)
-// 修复：锁屏切歌有进度无声音、按钮卡死
-// ================================================
+// iOS PWA 缁堟瀬鐗?playSong (v7.4 Ghost Fix)
+// 淇锛氶攣灞忓垏姝屾湁杩涘害鏃犲０闊炽€佹寜閽崱姝?// ================================================
 async function playSong(song, options = {}) {
     const { autoplay = true, startTime = 0, preserveProgress = false } = options;
     
-    // 环境检测
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    // 鐜妫€娴?    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     const isPWA = window.matchMedia('(display-mode: standalone)').matches || (window.navigator.standalone === true);
     const isIOSPWA = isIOS && isPWA;
     const isLockScreen = document.visibilityState === 'hidden';
     
-    console.log(`🎵 准备播放: ${song.name} (锁屏: ${isLockScreen})`);
+    console.log(`馃幍 鍑嗗鎾斁: ${song.name} (閿佸睆: ${isLockScreen})`);
 
     try {
-        // 停止之前的监控
-        stopCurrentTimeMonitor();
+        // 鍋滄涔嬪墠鐨勭洃鎺?        stopCurrentTimeMonitor();
         
         if (state._isPlayingSong) return false;
         state._isPlayingSong = true;
         state.currentSong = song;
         const player = dom.audioPlayer;
 
-        // 1. 启动守护 (关键：只要是 iOS PWA 就启动，不管是否锁屏，防止切歌间隙被杀)
+        // 1. 鍚姩瀹堟姢 (鍏抽敭锛氬彧瑕佹槸 iOS PWA 灏卞惎鍔紝涓嶇鏄惁閿佸睆锛岄槻姝㈠垏姝岄棿闅欒鏉€)
         if (isIOSPWA && window.solaraAudioGuard) {
             window.solaraAudioGuard.start();
-            console.log('🛡️ 守护启动：保护切歌间隙');
+            console.log('馃洝锔?瀹堟姢鍚姩锛氫繚鎶ゅ垏姝岄棿闅?);
         }
 
-        // 2. 抢占锁屏信息 (防止上一首结束后控件清空)
+        // 2. 鎶㈠崰閿佸睆淇℃伅 (闃叉涓婁竴棣栫粨鏉熷悗鎺т欢娓呯┖)
         updateMediaMetadataForLockScreen(song);
 
-        // 3. 暂停旧音频并保存音量
+        // 3. 鏆傚仠鏃ч煶棰戝苟淇濆瓨闊抽噺
         let safeVolume = player.volume;
         if (!safeVolume || safeVolume < 0.1) safeVolume = 1.0;
         
         if (!player.paused) {
             player.pause();
-            // 给一点缓冲时间让硬件释放
+            // 缁欎竴鐐圭紦鍐叉椂闂磋纭欢閲婃斁
             await new Promise(r => setTimeout(r, 30));
         }
 
-        // 4. 获取实际音频流 URL
+        // 4. 鑾峰彇瀹為檯闊抽娴?URL
         const quality = state.playbackQuality || '320';
         let rawUrl = API.getSongUrl(song, quality);
         if (!rawUrl.startsWith('http')) rawUrl = new URL(rawUrl, window.location.origin).href;
         
-        // 针对 QQ 音乐和酷我音乐，需要先获取实际的音频流 URL
+        // 閽堝 QQ 闊充箰鍜岄叿鎴戦煶涔愶紝闇€瑕佸厛鑾峰彇瀹為檯鐨勯煶棰戞祦 URL
         let streamUrl = rawUrl;
-        console.log('🔍 正在获取实际音频流 URL:', rawUrl);
+        console.log('馃攳 姝ｅ湪鑾峰彇瀹為檯闊抽娴?URL:', rawUrl);
         
         try {
-            // 发送 HEAD 请求检查 API 响应，不跟随重定向
-            const response = await fetch(rawUrl, { method: 'HEAD', redirect: 'manual' });
+            // 鍙戦€?HEAD 璇锋眰妫€鏌?API 鍝嶅簲锛屼笉璺熼殢閲嶅畾鍚?            const response = await fetch(rawUrl, { method: 'HEAD', redirect: 'manual' });
             
-            // 处理重定向情况，特别是酷我音乐的 302 重定向
-            if (response.status >= 300 && response.status < 400) {
+            // 澶勭悊閲嶅畾鍚戞儏鍐碉紝鐗瑰埆鏄叿鎴戦煶涔愮殑 302 閲嶅畾鍚?            if (response.status >= 300 && response.status < 400) {
                 const redirectUrl = response.headers.get('location');
                 if (redirectUrl) {
-                    console.log('🔀 API 返回重定向:', redirectUrl);
-                    // 添加防缓存参数到重定向 URL
+                    console.log('馃攢 API 杩斿洖閲嶅畾鍚?', redirectUrl);
+                    // 娣诲姞闃茬紦瀛樺弬鏁板埌閲嶅畾鍚?URL
                     const separator = redirectUrl.includes('?') ? '&' : '?';
                     streamUrl = `${redirectUrl}${separator}_t=${Date.now()}_r=${Math.random().toString(36).substr(2,5)}`;
-                    console.log('✅ 使用重定向 URL 作为音频源');
+                    console.log('鉁?浣跨敤閲嶅畾鍚?URL 浣滀负闊抽婧?);
                 } else {
-                    // 重定向但没有 location 头，使用原始 URL
-                    console.warn('⚠️ 重定向但没有 location 头，使用原始 URL');
+                    // 閲嶅畾鍚戜絾娌℃湁 location 澶达紝浣跨敤鍘熷 URL
+                    console.warn('鈿狅笍 閲嶅畾鍚戜絾娌℃湁 location 澶达紝浣跨敤鍘熷 URL');
                     const separator = rawUrl.includes('?') ? '&' : '?';
                     streamUrl = `${rawUrl}${separator}_t=${Date.now()}_r=${Math.random().toString(36).substr(2,5)}`;
                 }
             } else {
-                // 非重定向响应，检查内容类型
-                const contentType = response.headers.get('content-type');
+                // 闈為噸瀹氬悜鍝嶅簲锛屾鏌ュ唴瀹圭被鍨?                const contentType = response.headers.get('content-type');
                 
-                // 如果直接返回音频流，就使用该 URL
+                // 濡傛灉鐩存帴杩斿洖闊抽娴侊紝灏变娇鐢ㄨ URL
                 if (contentType && contentType.includes('audio/')) {
-                    console.log('✅ 直接使用 API URL 作为音频源');
-                    // 添加防缓存参数
-                    const separator = rawUrl.includes('?') ? '&' : '?';
+                    console.log('鉁?鐩存帴浣跨敤 API URL 浣滀负闊抽婧?);
+                    // 娣诲姞闃茬紦瀛樺弬鏁?                    const separator = rawUrl.includes('?') ? '&' : '?';
                     streamUrl = `${rawUrl}${separator}_t=${Date.now()}_r=${Math.random().toString(36).substr(2,5)}`;
                 } else {
-                    // 否则，发送 GET 请求获取完整响应
+                    // 鍚﹀垯锛屽彂閫?GET 璇锋眰鑾峰彇瀹屾暣鍝嶅簲
                     const getResponse = await fetch(rawUrl);
                     const getContentType = getResponse.headers.get('content-type');
                     
                     if (getContentType && getContentType.includes('application/json')) {
-                        // JSON 响应，尝试解析获取实际 URL
+                        // JSON 鍝嶅簲锛屽皾璇曡В鏋愯幏鍙栧疄闄?URL
                         const data = await getResponse.json();
-                        console.log('📋 API 返回 JSON 响应:', data);
+                        console.log('馃搵 API 杩斿洖 JSON 鍝嶅簲:', data);
                         
-                        // 根据不同 API 返回格式处理
+                        // 鏍规嵁涓嶅悓 API 杩斿洖鏍煎紡澶勭悊
                         if (data && data.url) {
                             streamUrl = data.url;
-                            console.log('✅ 从 JSON 中提取音频 URL:', streamUrl);
+                            console.log('鉁?浠?JSON 涓彁鍙栭煶棰?URL:', streamUrl);
                         } else if (data && data.type === 'media_file') {
-                            // 酷我音乐的 media_file 类型，直接使用 API URL
-                            console.log('✅ 酷我音乐 media_file 类型，直接使用 API URL');
+                            // 閰锋垜闊充箰鐨?media_file 绫诲瀷锛岀洿鎺ヤ娇鐢?API URL
+                            console.log('鉁?閰锋垜闊充箰 media_file 绫诲瀷锛岀洿鎺ヤ娇鐢?API URL');
                             const separator = rawUrl.includes('?') ? '&' : '?';
                             streamUrl = `${rawUrl}${separator}_t=${Date.now()}_r=${Math.random().toString(36).substr(2,5)}`;
                         } else {
-                            console.warn('⚠️ 无法从 JSON 响应中提取音频 URL，使用原始 URL');
+                            console.warn('鈿狅笍 鏃犳硶浠?JSON 鍝嶅簲涓彁鍙栭煶棰?URL锛屼娇鐢ㄥ師濮?URL');
                             const separator = rawUrl.includes('?') ? '&' : '?';
                             streamUrl = `${rawUrl}${separator}_t=${Date.now()}_r=${Math.random().toString(36).substr(2,5)}`;
                         }
                     } else if (getContentType && getContentType.includes('audio/')) {
-                        // 直接返回音频流，使用该 URL
-                        console.log('✅ 直接返回音频流，使用该 URL');
-                        // 添加防缓存参数
-                        const separator = rawUrl.includes('?') ? '&' : '?';
+                        // 鐩存帴杩斿洖闊抽娴侊紝浣跨敤璇?URL
+                        console.log('鉁?鐩存帴杩斿洖闊抽娴侊紝浣跨敤璇?URL');
+                        // 娣诲姞闃茬紦瀛樺弬鏁?                        const separator = rawUrl.includes('?') ? '&' : '?';
                         streamUrl = `${rawUrl}${separator}_t=${Date.now()}_r=${Math.random().toString(36).substr(2,5)}`;
                     } else {
-                        console.warn('⚠️ 未知的响应类型:', getContentType, '使用原始 URL');
+                        console.warn('鈿狅笍 鏈煡鐨勫搷搴旂被鍨?', getContentType, '浣跨敤鍘熷 URL');
                         const separator = rawUrl.includes('?') ? '&' : '?';
                         streamUrl = `${rawUrl}${separator}_t=${Date.now()}_r=${Math.random().toString(36).substr(2,5)}`;
                     }
                 }
             }
         } catch (error) {
-            console.warn('⚠️ 获取音频 URL 失败，使用原始 URL:', error);
+            console.warn('鈿狅笍 鑾峰彇闊抽 URL 澶辫触锛屼娇鐢ㄥ師濮?URL:', error);
             const separator = rawUrl.includes('?') ? '&' : '?';
             streamUrl = `${rawUrl}${separator}_t=${Date.now()}_r=${Math.random().toString(36).substr(2,5)}`;
         }
         
-        console.log('🎵 最终使用的音频 URL:', streamUrl);
+        console.log('馃幍 鏈€缁堜娇鐢ㄧ殑闊抽 URL:', streamUrl);
         
-        // 5. 柔性切换 (Soft Switch)
+        // 5. 鏌旀€у垏鎹?(Soft Switch)
         player.removeAttribute('crossOrigin');
         player.setAttribute('playsinline', '');
         player.setAttribute('webkit-playsinline', '');
@@ -6427,30 +6357,28 @@ async function playSong(song, options = {}) {
         player.src = streamUrl;
         state.currentAudioUrl = streamUrl;
         
-        // ⚡️ 预备状态：静音并加载
-        player.muted = false;
+        // 鈿★笍 棰勫鐘舵€侊細闈欓煶骞跺姞杞?        player.muted = false;
         player.volume = safeVolume;
         player.preload = 'auto';
         player.load();
 
-        // 6. 设置音频加载超时时间
-        const loadTimeout = 3000; // 统一超时时间，酷我音乐已禁用
-        console.log(`⏳ 等待音频加载，超时时间: ${loadTimeout}ms`);
+        // 6. 璁剧疆闊抽鍔犺浇瓒呮椂鏃堕棿
+        const loadTimeout = 3000; // 缁熶竴瓒呮椂鏃堕棿锛岄叿鎴戦煶涔愬凡绂佺敤
+        console.log(`鈴?绛夊緟闊抽鍔犺浇锛岃秴鏃舵椂闂? ${loadTimeout}ms`);
         
-        // 针对酷我音乐的预加载优化已禁用
-        /*
+        // 閽堝閰锋垜闊充箰鐨勯鍔犺浇浼樺寲宸茬鐢?        /*
         if (song.source === 'kuwo') {
-            console.log('🔍 酷我音乐：启用预加载优化');
-            // 尝试提前获取音频头信息，不阻塞主线程
+            console.log('馃攳 閰锋垜闊充箰锛氬惎鐢ㄩ鍔犺浇浼樺寲');
+            // 灏濊瘯鎻愬墠鑾峰彇闊抽澶翠俊鎭紝涓嶉樆濉炰富绾跨▼
             fetch(streamUrl, { method: 'HEAD' })
                 .then(response => {
-                    console.log('📋 酷我音乐头信息:', {
+                    console.log('馃搵 閰锋垜闊充箰澶翠俊鎭?', {
                         contentType: response.headers.get('content-type'),
                         contentLength: response.headers.get('content-length')
                     });
                 })
                 .catch(error => {
-                    console.warn('⚠️ 获取酷我音乐头信息失败:', error);
+                    console.warn('鈿狅笍 鑾峰彇閰锋垜闊充箰澶翠俊鎭け璐?', error);
                 });
         }
         */
@@ -6459,12 +6387,11 @@ async function playSong(song, options = {}) {
             let resolved = false;
             let loadStartTime = Date.now();
             
-            // 设置不同的超时时间，酷我音乐需要更长时间
-            const timer = setTimeout(() => {
+            // 璁剧疆涓嶅悓鐨勮秴鏃舵椂闂达紝閰锋垜闊充箰闇€瑕佹洿闀挎椂闂?            const timer = setTimeout(() => {
                 if(!resolved) {
                     resolved=true;
                     const elapsed = Date.now() - loadStartTime;
-                    console.warn(`⏱️  音频加载超时，实际等待: ${elapsed}ms，继续执行`);
+                    console.warn(`鈴憋笍  闊抽鍔犺浇瓒呮椂锛屽疄闄呯瓑寰? ${elapsed}ms锛岀户缁墽琛宍);
                     resolve();
                 }
             }, loadTimeout);
@@ -6475,42 +6402,41 @@ async function playSong(song, options = {}) {
                     clearTimeout(timer);
                     const elapsed = Date.now() - loadStartTime;
                     if (event && event.type === 'error') {
-                        console.error('❌ 音频加载错误:', {
+                        console.error('鉂?闊抽鍔犺浇閿欒:', {
                             eventType: event.type,
                             errorCode: player.error ? player.error.code : 'unknown',
                             errorMessage: player.error ? player.error.message : 'unknown',
                             elapsedTime: elapsed
                         });
                     } else {
-                        console.log(`✅ 音频加载完成，耗时: ${elapsed}ms，事件类型: ${event ? event.type : 'unknown'}`);
+                        console.log(`鉁?闊抽鍔犺浇瀹屾垚锛岃€楁椂: ${elapsed}ms锛屼簨浠剁被鍨? ${event ? event.type : 'unknown'}`);
                     }
                     resolve();
                 }
             };
             
-            // 添加更多加载事件监听，确保不错过任何状态变化
-            player.addEventListener('canplaythrough', done, { once: true });
+            // 娣诲姞鏇村鍔犺浇浜嬩欢鐩戝惉锛岀‘淇濅笉閿欒繃浠讳綍鐘舵€佸彉鍖?            player.addEventListener('canplaythrough', done, { once: true });
             player.addEventListener('canplay', done, { once: true });
             player.addEventListener('loadeddata', done, { once: true });
             player.addEventListener('loadedmetadata', done, { once: true });
             player.addEventListener('loadstart', () => {
-                console.log('🚀 音频开始加载');
+                console.log('馃殌 闊抽寮€濮嬪姞杞?);
             }, { once: true });
             player.addEventListener('progress', () => {
                 const buffered = player.buffered.length > 0 ? player.buffered.end(0) : 0;
-                console.log(`📊 音频加载进度: ${buffered.toFixed(2)}s`);
+                console.log(`馃搳 闊抽鍔犺浇杩涘害: ${buffered.toFixed(2)}s`);
             });
             player.addEventListener('error', done, { once: true });
         });
 
-        // 7. 恢复进度
+        // 7. 鎭㈠杩涘害
         let targetTime = startTime;
         if (preserveProgress) {
             targetTime = state.currentList === "favorite" ? state.favoritePlaybackTime : state.currentPlaybackTime;
         }
         if (targetTime > 0) player.currentTime = targetTime;
 
-        // 8. UI 更新
+        // 8. UI 鏇存柊
         if (isIOSPWA && isLockScreen) {
             state.needUpdateOnUnlock = true;
         } else {
@@ -6521,7 +6447,7 @@ async function playSong(song, options = {}) {
             }, 100);
         }
         
-        // 9. 播放逻辑 (核心修复区)
+        // 9. 鎾斁閫昏緫 (鏍稿績淇鍖?
         if (autoplay) {
             state.isPlaying = true;
             updatePlayPauseButton();
@@ -6529,14 +6455,14 @@ async function playSong(song, options = {}) {
             
 
 
-            // 给一点点缓冲
+            // 缁欎竴鐐圭偣缂撳啿
             await new Promise(r => setTimeout(r, 50));
 
             try {
-                // 尝试播放
+                // 灏濊瘯鎾斁
                 const playResult = await player.play();
-                console.log('✅ 播放指令已发出，结果:', playResult);
-                console.log('🔊 音频状态检查:', {
+                console.log('鉁?鎾斁鎸囦护宸插彂鍑猴紝缁撴灉:', playResult);
+                console.log('馃攰 闊抽鐘舵€佹鏌?', {
                     paused: player.paused,
                     ended: player.ended,
                     readyState: player.readyState,
@@ -6546,39 +6472,32 @@ async function playSong(song, options = {}) {
 
 
 
-                // ⚡️⚡️ [核心修复 1] 硬件通道强制握手 ⚡️⚡️
-                // 在 iOS 锁屏下，有时候 Audio 元素状态是 playing，但硬件通道没打开。
-                // 我们通过快速切换 muted 状态来“惊醒”音频守护进程。
-                if (isIOS) {
+                // 鈿★笍鈿★笍 [鏍稿績淇 1] 纭欢閫氶亾寮哄埗鎻℃墜 鈿★笍鈿★笍
+                // 鍦?iOS 閿佸睆涓嬶紝鏈夋椂鍊?Audio 鍏冪礌鐘舵€佹槸 playing锛屼絾纭欢閫氶亾娌℃墦寮€銆?                // 鎴戜滑閫氳繃蹇€熷垏鎹?muted 鐘舵€佹潵鈥滄儕閱掆€濋煶棰戝畧鎶よ繘绋嬨€?                if (isIOS) {
                     setTimeout(() => {
                         player.muted = true;
                         player.volume = safeVolume;
                         setTimeout(() => {
-                            player.muted = false; // 这一刻，声音应该出来了
-                            console.log('🔊 硬件通道强制握手完成');
-                        }, 50); // 50ms 的静音闪烁
-                    }, 100);
+                            player.muted = false; // 杩欎竴鍒伙紝澹伴煶搴旇鍑烘潵浜?                            console.log('馃攰 纭欢閫氶亾寮哄埗鎻℃墜瀹屾垚');
+                        }, 50); // 50ms 鐨勯潤闊抽棯鐑?                    }, 100);
                 }
                 
-                // ⚡️⚡️ [核心修复 2] 延迟关闭守护进程 ⚡️⚡️
-                // 不要立即关闭！让 AudioContext 再跑 3 秒，和新歌重叠一会儿。
-                // 这就像接力赛，两人同跑一段距离再松手，防止掉棒。
-                if (isIOSPWA && window.solaraAudioGuard) {
-                    console.log('⏳ 守护进程将在 3 秒后退出...');
+                // 鈿★笍鈿★笍 [鏍稿績淇 2] 寤惰繜鍏抽棴瀹堟姢杩涚▼ 鈿★笍鈿★笍
+                // 涓嶈绔嬪嵆鍏抽棴锛佽 AudioContext 鍐嶈窇 3 绉掞紝鍜屾柊姝岄噸鍙犱竴浼氬効銆?                // 杩欏氨鍍忔帴鍔涜禌锛屼袱浜哄悓璺戜竴娈佃窛绂诲啀鏉炬墜锛岄槻姝㈡帀妫掋€?                if (isIOSPWA && window.solaraAudioGuard) {
+                    console.log('鈴?瀹堟姢杩涚▼灏嗗湪 3 绉掑悗閫€鍑?..');
                     setTimeout(() => {
-                        if (!player.paused) { // 只有还在播放才关闭
-                            window.solaraAudioGuard.stop();
-                            console.log('🛑 守护进程安全退出');
+                        if (!player.paused) { // 鍙湁杩樺湪鎾斁鎵嶅叧闂?                            window.solaraAudioGuard.stop();
+                            console.log('馃洃 瀹堟姢杩涚▼瀹夊叏閫€鍑?);
                         }
                     }, 3000);
                 }
                 
-                // 再次刷新锁屏信息，确保 metadata 没被系统清空
+                // 鍐嶆鍒锋柊閿佸睆淇℃伅锛岀‘淇?metadata 娌¤绯荤粺娓呯┖
                 setTimeout(() => updateMediaMetadataForLockScreen(song), 500);
 
             } catch (error) {
-                console.warn('⚠️ 播放受阻，尝试强力修复:', error);
-                // 兜底策略：如果播放失败，不关闭守护进程，甚至尝试重新加载
+                console.warn('鈿狅笍 鎾斁鍙楅樆锛屽皾璇曞己鍔涗慨澶?', error);
+                // 鍏滃簳绛栫暐锛氬鏋滄挱鏀惧け璐ワ紝涓嶅叧闂畧鎶よ繘绋嬶紝鐢氳嚦灏濊瘯閲嶆柊鍔犺浇
                 try {
                     player.muted = true;
                     await player.play();
@@ -6586,7 +6505,7 @@ async function playSong(song, options = {}) {
                 } catch (e) {
                     state.isPlaying = false;
                     updatePlayPauseButton();
-                    // 播放失败也延迟关闭，或者不关闭
+                    // 鎾斁澶辫触涔熷欢杩熷叧闂紝鎴栬€呬笉鍏抽棴
                     if (isIOSPWA && window.solaraAudioGuard) {
                         setTimeout(() => window.solaraAudioGuard.stop(), 2000);
                     }
@@ -6603,7 +6522,7 @@ async function playSong(song, options = {}) {
         return true;
 
     } catch (error) {
-        console.error("播放流程异常:", error);
+        console.error("鎾斁娴佺▼寮傚父:", error);
         state.isPlaying = false;
         updatePlayPauseButton();
         if (isIOSPWA && window.solaraAudioGuard) window.solaraAudioGuard.stop();
@@ -6613,7 +6532,7 @@ async function playSong(song, options = {}) {
     }
 }
 
-// 修复：播放歌曲函数 - 支持统一播放列表
+// 淇锛氭挱鏀炬瓕鏇插嚱鏁?- 鏀寔缁熶竴鎾斁鍒楄〃
 function waitForAudioReady(player) {
     if (!player) return Promise.resolve();
     if (player.readyState >= 1) {
@@ -6630,7 +6549,7 @@ function waitForAudioReady(player) {
         };
         const onError = () => {
             cleanup();
-            reject(new Error('音频加载失败'));
+            reject(new Error('闊抽鍔犺浇澶辫触'));
         };
         player.addEventListener('loadedmetadata', onLoaded, { once: true });
         player.addEventListener('error', onError, { once: true });
@@ -6683,45 +6602,43 @@ function scheduleDeferredSongAssets(song, playPromise) {
     }
 }
 
-// 修复：自动播放下一首 (带状态重置)
+// 淇锛氳嚜鍔ㄦ挱鏀句笅涓€棣?(甯︾姸鎬侀噸缃?
 function handleAudioError(event) {
     const player = event.target;
-    console.error('🎵 音频播放错误:', {
+    console.error('馃幍 闊抽鎾斁閿欒:', {
         errorCode: player.error.code,
         errorMessage: player.error.message,
         currentSong: state.currentSong,
         audioUrl: state.currentAudioUrl
     });
     
-    // 针对酷我音乐的特殊处理已禁用
+    // 閽堝閰锋垜闊充箰鐨勭壒娈婂鐞嗗凡绂佺敤
     /*
     if (state.currentSong && state.currentSong.source === 'kuwo') {
-        console.error('🔍 酷我音乐播放失败，尝试直接使用 API 链接重新播放...');
-        // 尝试重新构建音频 URL，可能需要调整 API 参数
+        console.error('馃攳 閰锋垜闊充箰鎾斁澶辫触锛屽皾璇曠洿鎺ヤ娇鐢?API 閾炬帴閲嶆柊鎾斁...');
+        // 灏濊瘯閲嶆柊鏋勫缓闊抽 URL锛屽彲鑳介渶瑕佽皟鏁?API 鍙傛暟
         try {
             const quality = state.playbackQuality || '320';
             const audioUrl = API.getSongUrl(state.currentSong, quality);
-            console.log('🔄 重新尝试酷我音乐 URL:', audioUrl);
+            console.log('馃攧 閲嶆柊灏濊瘯閰锋垜闊充箰 URL:', audioUrl);
             player.src = audioUrl;
             player.load();
             player.play();
         } catch (retryError) {
-            console.error('❌ 酷我音乐重新播放也失败:', retryError);
+            console.error('鉂?閰锋垜闊充箰閲嶆柊鎾斁涔熷け璐?', retryError);
         }
     }
     */
     
-    // 重置播放状态
-    state.isPlaying = false;
+    // 閲嶇疆鎾斁鐘舵€?    state.isPlaying = false;
     updatePlayPauseButton();
     state._isPlayingSong = false;
 }
 
 function autoPlayNext() {
-    console.log('🔄 触发自动连播...');
+    console.log('馃攧 瑙﹀彂鑷姩杩炴挱...');
     
-    // 强制重置播放锁，防止因为上一首结束时的状态错误导致无法切歌
-    state._isPlayingSong = false;
+    // 寮哄埗閲嶇疆鎾斁閿侊紝闃叉鍥犱负涓婁竴棣栫粨鏉熸椂鐨勭姸鎬侀敊璇鑷存棤娉曞垏姝?    state._isPlayingSong = false;
     
     const mode = typeof getActivePlayMode === 'function' ? getActivePlayMode() : 'sequence';
     
@@ -6739,7 +6656,7 @@ function autoPlayNext() {
     updatePlayPauseButton();
 }
 
-// 修复：播放下一首 - 支持播放模式和统一播放列表
+// 淇锛氭挱鏀句笅涓€棣?- 鏀寔鎾斁妯″紡鍜岀粺涓€鎾斁鍒楄〃
 async function playNext() {
     if (state.currentList === "favorite") {
         const favorites = ensureFavoriteSongsArray();
@@ -6778,10 +6695,10 @@ async function playNext() {
 
     const mode = state.playMode || "list";
     if (mode === "random") {
-        // 随机播放
+        // 闅忔満鎾斁
         nextIndex = Math.floor(Math.random() * playlist.length);
     } else if (mode === "list") {
-        // 列表循环
+        // 鍒楄〃寰幆
         nextIndex = (state.currentTrackIndex + 1) % playlist.length;
     } else if (mode === "single") {
         nextIndex = state.currentTrackIndex >= 0 ? state.currentTrackIndex : 0;
@@ -6802,7 +6719,7 @@ async function playNext() {
     }
 }
 
-// 修复：播放上一首 - 支持播放模式和统一播放列表
+// 淇锛氭挱鏀句笂涓€棣?- 鏀寔鎾斁妯″紡鍜岀粺涓€鎾斁鍒楄〃
 async function playPrevious() {
     if (state.currentList === "favorite") {
         const favorites = ensureFavoriteSongsArray();
@@ -6840,10 +6757,10 @@ async function playPrevious() {
 
     const mode = state.playMode || "list";
     if (mode === "random") {
-        // 随机播放
+        // 闅忔満鎾斁
         prevIndex = Math.floor(Math.random() * playlist.length);
     } else if (mode === "list") {
-        // 列表循环
+        // 鍒楄〃寰幆
         prevIndex = state.currentTrackIndex - 1;
         if (prevIndex < 0) prevIndex = playlist.length - 1;
     } else if (mode === "single") {
@@ -6865,8 +6782,7 @@ async function playPrevious() {
     }
 }
 
-// 修复：在线音乐播放函数
-async function playOnlineSong(index) {
+// 淇锛氬湪绾块煶涔愭挱鏀惧嚱鏁?async function playOnlineSong(index) {
     const song = state.onlineSongs[index];
     if (!song) return;
 
@@ -6879,13 +6795,12 @@ async function playOnlineSong(index) {
         updateOnlineHighlight();
         updatePlayModeUI();
     } catch (error) {
-        console.error("播放失败:", error);
-        showNotification("播放失败，请稍后重试", "error");
+        console.error("鎾斁澶辫触:", error);
+        showNotification("鎾斁澶辫触锛岃绋嶅悗閲嶈瘯", "error");
     }
 }
 
-// 修复：更新在线音乐高亮
-function updateOnlineHighlight() {
+// 淇锛氭洿鏂板湪绾块煶涔愰珮浜?function updateOnlineHighlight() {
     if (!dom.playlistItems) return;
     const playlistItems = dom.playlistItems.querySelectorAll(".playlist-item");
     playlistItems.forEach((item, index) => {
@@ -6898,15 +6813,15 @@ function updateOnlineHighlight() {
 }
 
 const EXPLORE_RADAR_GENRES = [
-    "排行榜",
-    "每日排行榜",
-    "每日排行",
-    "民谣",
+    "鎺掕姒?,
+    "姣忔棩鎺掕姒?,
+    "姣忔棩鎺掕",
+    "姘戣埃",
 ];
 
 function pickRandomExploreGenre() {
     if (!Array.isArray(EXPLORE_RADAR_GENRES) || EXPLORE_RADAR_GENRES.length === 0) {
-        return "流行";
+        return "娴佽";
     }
     const index = Math.floor(Math.random() * EXPLORE_RADAR_GENRES.length);
     return EXPLORE_RADAR_GENRES[index];
@@ -6922,8 +6837,7 @@ function pickRandomExploreSource() {
     return EXPLORE_RADAR_SOURCES[index];
 }
 
-// 探索雷达：通过代理后端随机搜歌并刷新播放列表
-async function exploreOnlineMusic() {
+// 鎺㈢储闆疯揪锛氶€氳繃浠ｇ悊鍚庣闅忔満鎼滄瓕骞跺埛鏂版挱鏀惧垪琛?async function exploreOnlineMusic() {
     const desktopButton = dom.loadOnlineBtn;
     const mobileButton = dom.mobileExploreButton;
     const btnText = desktopButton ? desktopButton.querySelector(".btn-text") : null;
@@ -6954,15 +6868,15 @@ async function exploreOnlineMusic() {
         const results = await API.search(randomGenre, source, 10, 1);
 
         if (!Array.isArray(results) || results.length === 0) {
-            showNotification("探索雷达：未找到歌曲", "error");
-            debugLog(`探索雷达未找到歌曲，关键词：${randomGenre}，音源：${source}`);
+            showNotification("鎺㈢储闆疯揪锛氭湭鎵惧埌姝屾洸", "error");
+            debugLog(`鎺㈢储闆疯揪鏈壘鍒版瓕鏇诧紝鍏抽敭璇嶏細${randomGenre}锛岄煶婧愶細${source}`);
             return;
         }
 
         const normalizedSongs = results.map((song) => ({
             id: song.id,
             name: song.name,
-            artist: Array.isArray(song.artist) ? song.artist.join(" / ") : (song.artist || "未知艺术家"),
+            artist: Array.isArray(song.artist) ? song.artist.join(" / ") : (song.artist || "鏈煡鑹烘湳瀹?),
             album: song.album || "",
             source: song.source || source,
             lyric_id: song.lyric_id || song.id,
@@ -6988,12 +6902,12 @@ async function exploreOnlineMusic() {
         }
 
         if (appendedSongs.length === 0) {
-            showNotification("探索雷达：本次未找到新的歌曲，当前列表已包含这些曲目", "info");
-            debugLog(`探索雷达无新增歌曲，关键词：${randomGenre}`);
+            showNotification("鎺㈢储闆疯揪锛氭湰娆℃湭鎵惧埌鏂扮殑姝屾洸锛屽綋鍓嶅垪琛ㄥ凡鍖呭惈杩欎簺鏇茬洰", "info");
+            debugLog(`鎺㈢储闆疯揪鏃犳柊澧炴瓕鏇诧紝鍏抽敭璇嶏細${randomGenre}`);
             return;
         }
 
-        // 优化1：分批添加歌曲，减少UI阻塞
+        // 浼樺寲1锛氬垎鎵规坊鍔犳瓕鏇诧紝鍑忓皯UI闃诲
         const batchSize = 10;
         const totalAppended = appendedSongs.length;
         
@@ -7004,70 +6918,67 @@ async function exploreOnlineMusic() {
             state.currentPlaylist = "playlist";
             state.currentList = "playlist";
             
-            // 渲染当前批次
+            // 娓叉煋褰撳墠鎵规
             renderPlaylist();
             updatePlaylistHighlight();
             
-            // 等待一小段时间，让UI有时间更新
-            if (i + batchSize < totalAppended) {
+            // 绛夊緟涓€灏忔鏃堕棿锛岃UI鏈夋椂闂存洿鏂?            if (i + batchSize < totalAppended) {
                 await new Promise(resolve => setTimeout(resolve, 50));
             }
         }
 
-        showNotification(`探索雷达：新增${appendedSongs.length}首 ${randomGenre} 歌曲`);
-        debugLog(`探索雷达加载成功，关键词：${randomGenre}，音源：${source}，新增歌曲数：${appendedSongs.length}`);
+        showNotification(`鎺㈢储闆疯揪锛氭柊澧?{appendedSongs.length}棣?${randomGenre} 姝屾洸`);
+        debugLog(`鎺㈢储闆疯揪鍔犺浇鎴愬姛锛屽叧閿瘝锛?{randomGenre}锛岄煶婧愶細${source}锛屾柊澧炴瓕鏇叉暟锛?{appendedSongs.length}`);
 
         const shouldAutoplay = existingSongs.length === 0 && state.playlistSongs.length > 0;
         if (shouldAutoplay) {
-            // 优化2：预加载第一首歌的音频，减少播放延迟
+            // 浼樺寲2锛氶鍔犺浇绗竴棣栨瓕鐨勯煶棰戯紝鍑忓皯鎾斁寤惰繜
             const firstSong = state.playlistSongs[0];
             if (firstSong) {
-                // 直接播放，不再预加载，避免可能的abort错误
+                // 鐩存帴鎾斁锛屼笉鍐嶉鍔犺浇锛岄伩鍏嶅彲鑳界殑abort閿欒
                 await playPlaylistSong(0);
             }
         } else {
             savePlayerState();
         }
     } catch (error) {
-        console.error("探索雷达错误:", error);
-        showNotification("探索雷达获取失败，请稍后重试", "error");
+        console.error("鎺㈢储闆疯揪閿欒:", error);
+        showNotification("鎺㈢储闆疯揪鑾峰彇澶辫触锛岃绋嶅悗閲嶈瘯", "error");
     } finally {
         setLoadingState(false);
     }
 }
 
-// 修复：加载歌词
-async function loadLyrics(song) {
-    // 如果是隐身模式，跳过歌词加载
+// 淇锛氬姞杞芥瓕璇?async function loadLyrics(song) {
+    // 濡傛灉鏄殣韬ā寮忥紝璺宠繃姝岃瘝鍔犺浇
     if (shouldUseStealthMode() && !state.forceUIUpdate) {
-        console.log('🔒 隐身模式：跳过歌词加载');
+        console.log('馃敀 闅愯韩妯″紡锛氳烦杩囨瓕璇嶅姞杞?);
         return;
     }
     
     try {
         const lyricUrl = API.getLyric(song);
-        debugLog(`获取歌词URL: ${lyricUrl}`);
+        debugLog(`鑾峰彇姝岃瘝URL: ${lyricUrl}`);
 
         const lyricData = await API.fetchJson(lyricUrl);
-        debugLog(`歌词API返回数据: ${JSON.stringify(lyricData).substring(0, 200)}...`);
+        debugLog(`姝岃瘝API杩斿洖鏁版嵁: ${JSON.stringify(lyricData).substring(0, 200)}...`);
 
-        // 处理不同格式的歌词数据
-        let lyricText = '';
+        // 澶勭悊涓嶅悓鏍煎紡鐨勬瓕璇嶆暟鎹?        let lyricText = '';
         
         if (typeof lyricData === 'string') {
-            // 如果直接返回字符串，可能就是歌词文本
+            // 濡傛灉鐩存帴杩斿洖瀛楃涓诧紝鍙兘灏辨槸姝岃瘝鏂囨湰
             lyricText = lyricData;
         } else if (lyricData && lyricData.lyric) {
-            // 标准格式：{ lyric: "歌词文本" }
+            // 鏍囧噯鏍煎紡锛歿 lyric: "姝岃瘝鏂囨湰" }
             lyricText = lyricData.lyric;
         } else if (lyricData && lyricData.data && lyricData.data.lyric) {
-            // 可能的格式：{ data: { lyric: "歌词文本" } }
+            // 鍙兘鐨勬牸寮忥細{ data: { lyric: "姝岃瘝鏂囨湰" } }
             lyricText = lyricData.data.lyric;
         } else if (lyricData && lyricData.lrc && lyricData.lrc.lyric) {
-            // 网易云音乐API格式
+            // 缃戞槗浜戦煶涔怉PI鏍煎紡
             lyricText = lyricData.lrc.lyric;
         } else if (lyricData && lyricData.content) {
-            // 可能的格式：{ content: "歌词文本" }
+            // 鍙兘鐨勬牸寮忥細{ content: "姝岃瘝鏂囨湰" }
             lyricText = lyricData.content;
         }
         
@@ -7075,28 +6986,27 @@ async function loadLyrics(song) {
             parseLyrics(lyricText.trim());
             dom.lyrics.classList.remove("empty");
             dom.lyrics.dataset.placeholder = "default";
-            debugLog(`歌词加载成功: ${state.lyricsData.length} 行`);
+            debugLog(`姝岃瘝鍔犺浇鎴愬姛: ${state.lyricsData.length} 琛宍);
         } else {
-            setLyricsContentHtml("<div>暂无歌词</div>");
+            setLyricsContentHtml("<div>鏆傛棤姝岃瘝</div>");
             dom.lyrics.classList.add("empty");
             dom.lyrics.dataset.placeholder = "message";
             state.lyricsData = [];
             state.currentLyricLine = -1;
-            debugLog("歌词加载失败: 无歌词数据");
+            debugLog("姝岃瘝鍔犺浇澶辫触: 鏃犳瓕璇嶆暟鎹?);
         }
     } catch (error) {
-        console.error("加载歌词失败:", error);
-        setLyricsContentHtml("<div>歌词加载失败</div>");
+        console.error("鍔犺浇姝岃瘝澶辫触:", error);
+        setLyricsContentHtml("<div>姝岃瘝鍔犺浇澶辫触</div>");
         dom.lyrics.classList.add("empty");
         dom.lyrics.dataset.placeholder = "message";
         state.lyricsData = [];
         state.currentLyricLine = -1;
-        debugLog(`歌词加载失败: ${error}`);
+        debugLog(`姝岃瘝鍔犺浇澶辫触: ${error}`);
     }
 }
 
-// 修复：解析歌词
-function parseLyrics(lyricText) {
+// 淇锛氳В鏋愭瓕璇?function parseLyrics(lyricText) {
     const lines = lyricText.split('\n');
     const lyrics = [];
 
@@ -7117,7 +7027,7 @@ function parseLyrics(lyricText) {
 
     state.lyricsData = lyrics.sort((a, b) => a.time - b.time);
     displayLyrics();
-    debugLog(`解析歌词完成: ${state.lyricsData.length} 行`);
+    debugLog(`瑙ｆ瀽姝岃瘝瀹屾垚: ${state.lyricsData.length} 琛宍);
 }
 
 function setLyricsContentHtml(html) {
@@ -7158,8 +7068,7 @@ function clearLyricsIfLibraryEmpty() {
     }
 }
 
-// 修复：显示歌词
-function displayLyrics() {
+// 淇锛氭樉绀烘瓕璇?function displayLyrics() {
     const lyricsHtml = state.lyricsData.map((lyric, index) =>
         `<div data-time="${lyric.time}" data-index="${index}">${lyric.text}</div>`
     ).join("");
@@ -7172,14 +7081,12 @@ function displayLyrics() {
     }
 }
 
-// 修复：同步歌词
-function syncLyrics() {
+// 淇锛氬悓姝ユ瓕璇?function syncLyrics() {
     if (state.lyricsData.length === 0) return;
 
     const currentTime = dom.audioPlayer.currentTime;
     let currentIndex = -1;
-    // 歌词提前0.5秒聚焦
-    const advanceTime = 0.5;
+    // 姝岃瘝鎻愬墠0.5绉掕仛鐒?    const advanceTime = 0.5;
 
     for (let i = 0; i < state.lyricsData.length; i++) {
         if (currentTime + advanceTime >= state.lyricsData[i].time) {
@@ -7223,7 +7130,7 @@ function syncLyrics() {
     }
 }
 
-// 新增：滚动到当前歌词 - 修复居中显示问题
+// 鏂板锛氭粴鍔ㄥ埌褰撳墠姝岃瘝 - 淇灞呬腑鏄剧ず闂
 function scrollToCurrentLyric(element, containerOverride) {
     const container = containerOverride || dom.lyricsScroll || dom.lyrics;
     if (!container || !element) {
@@ -7233,11 +7140,11 @@ function scrollToCurrentLyric(element, containerOverride) {
     const elementRect = element.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
 
-    // 计算元素在容器内部的可视位置，避免受到 offsetParent 影响
+    // 璁＄畻鍏冪礌鍦ㄥ鍣ㄥ唴閮ㄧ殑鍙浣嶇疆锛岄伩鍏嶅彈鍒?offsetParent 褰卞搷
     const elementOffsetTop = elementRect.top - containerRect.top + container.scrollTop;
     const elementHeight = elementRect.height;
 
-    // 目标滚动位置：让当前歌词的中心与容器中心对齐
+    // 鐩爣婊氬姩浣嶇疆锛氳褰撳墠姝岃瘝鐨勪腑蹇冧笌瀹瑰櫒涓績瀵归綈
     const targetScrollTop = elementOffsetTop - (containerHeight / 2) + (elementHeight / 2);
 
     const maxScrollTop = container.scrollHeight - containerHeight;
@@ -7256,45 +7163,38 @@ function scrollToCurrentLyric(element, containerOverride) {
 
 }
 
-// 修复：下载歌曲 - 使用Blob URL，确保触发下载而非新窗口播放
-// ============================================================
-// 最终稳妥版下载函数：支持JSON响应和直接下载
-// ============================================================
+// 淇锛氫笅杞芥瓕鏇?- 浣跨敤Blob URL锛岀‘淇濊Е鍙戜笅杞借€岄潪鏂扮獥鍙ｆ挱鏀?// ============================================================
+// 鏈€缁堢ǔ濡ョ増涓嬭浇鍑芥暟锛氭敮鎸丣SON鍝嶅簲鍜岀洿鎺ヤ笅杞?// ============================================================
 async function downloadSong(song, quality = null) {
     try {
-        // 恢复质量选择功能，根据不同质量获取不同链接
-        const finalQuality = quality || state.playbackQuality || 'flac';
-        showNotification(`正在获取 ${song.name} 下载地址...`, 'info');
+        // 鎭㈠璐ㄩ噺閫夋嫨鍔熻兘锛屾牴鎹笉鍚岃川閲忚幏鍙栦笉鍚岄摼鎺?        const finalQuality = quality || state.playbackQuality || 'flac';
+        showNotification(`姝ｅ湪鑾峰彇 ${song.name} 涓嬭浇鍦板潃...`, 'info');
 
-        // 1. 获取API端点URL
+        // 1. 鑾峰彇API绔偣URL
         const apiUrl = API.getSongUrl(song, finalQuality);
         if (!apiUrl) {
-            throw new Error('无法获取API链接');
+            throw new Error('鏃犳硶鑾峰彇API閾炬帴');
         }
-        console.log('🔗 API端点URL:', apiUrl);
+        console.log('馃敆 API绔偣URL:', apiUrl);
 
-        // 2. 生成文件名，处理artist为数组的情况
-        const artistName = Array.isArray(song.artist) ? song.artist.join(', ') : (song.artist || '未知艺术家');
-        const songName = song.name || '未知歌曲';
-        // 根据质量确定文件扩展名
-        let fileExtension = 'mp3';
+        // 2. 鐢熸垚鏂囦欢鍚嶏紝澶勭悊artist涓烘暟缁勭殑鎯呭喌
+        const artistName = Array.isArray(song.artist) ? song.artist.join(', ') : (song.artist || '鏈煡鑹烘湳瀹?);
+        const songName = song.name || '鏈煡姝屾洸';
+        // 鏍规嵁璐ㄩ噺纭畾鏂囦欢鎵╁睍鍚?        let fileExtension = 'mp3';
         if (finalQuality === '999' || finalQuality === 'flac' || finalQuality === 'flac24bit') {
             fileExtension = 'flac';
         }
-        // 按照用户要求的格式：歌曲名 - 艺术家.扩展名
-        // 确保文件名安全，移除特殊字符
+        // 鎸夌収鐢ㄦ埛瑕佹眰鐨勬牸寮忥細姝屾洸鍚?- 鑹烘湳瀹?鎵╁睍鍚?        // 纭繚鏂囦欢鍚嶅畨鍏紝绉婚櫎鐗规畩瀛楃
         const safeSongName = songName.replace(/[<>:"/\\|?*]/g, '_').replace(/\s+/g, ' ');
         const safeArtistName = artistName.replace(/[<>:"/\\|?*]/g, '_').replace(/\s+/g, ' ');
         const fileName = `${safeSongName} - ${safeArtistName}.${fileExtension}`;
-        console.log('📁 最终文件名:', fileName);
+        console.log('馃搧 鏈€缁堟枃浠跺悕:', fileName);
 
-        // 3. 针对不同音质的优化下载策略
-        console.log('🎵 优化的下载策略，质量:', finalQuality);
+        // 3. 閽堝涓嶅悓闊宠川鐨勪紭鍖栦笅杞界瓥鐣?        console.log('馃幍 浼樺寲鐨勪笅杞界瓥鐣ワ紝璐ㄩ噺:', finalQuality);
         
-        // 统一所有音质的下载方式，完全复用MP3的成功代码
-        console.log('🎵 统一下载方式：复用MP3的成功代码');
+        // 缁熶竴鎵€鏈夐煶璐ㄧ殑涓嬭浇鏂瑰紡锛屽畬鍏ㄥ鐢∕P3鐨勬垚鍔熶唬鐮?        console.log('馃幍 缁熶竴涓嬭浇鏂瑰紡锛氬鐢∕P3鐨勬垚鍔熶唬鐮?);
         
-        // 为确保IDM和浏览器都能正确识别文件名，使用代理下载方式处理跨域
+        // 涓虹‘淇滻DM鍜屾祻瑙堝櫒閮借兘姝ｇ‘璇嗗埆鏂囦欢鍚嶏紝浣跨敤浠ｇ悊涓嬭浇鏂瑰紡澶勭悊璺ㄥ煙
         const link = document.createElement('a');
         link.href = apiUrl;
         link.download = fileName;
@@ -7305,97 +7205,90 @@ async function downloadSong(song, quality = null) {
         link.click();
         document.body.removeChild(link);
         
-        // 为确保IDM能捕获下载，延迟一小段时间后尝试第二次触发（如果需要）
+        // 涓虹‘淇滻DM鑳芥崟鑾蜂笅杞斤紝寤惰繜涓€灏忔鏃堕棿鍚庡皾璇曠浜屾瑙﹀彂锛堝鏋滈渶瑕侊級
         setTimeout(() => {
-            // 尝试使用fetch方式创建blob URL作为备选方案
-            downloadWithBlobUrl(apiUrl, fileName);
+            // 灏濊瘯浣跨敤fetch鏂瑰紡鍒涘缓blob URL浣滀负澶囬€夋柟妗?            downloadWithBlobUrl(apiUrl, fileName);
         }, 100);
         
-        // 根据质量显示不同的通知
-        const qualityText = (finalQuality === 'flac' || finalQuality === '999') ? ' (无损音质)' : '';
-        showNotification(`正在下载: ${song.name}${qualityText}`, 'success');
-        console.log(`✅ 下载流程完成，文件名: ${fileName}`);
+        // 鏍规嵁璐ㄩ噺鏄剧ず涓嶅悓鐨勯€氱煡
+        const qualityText = (finalQuality === 'flac' || finalQuality === '999') ? ' (鏃犳崯闊宠川)' : '';
+        showNotification(`姝ｅ湪涓嬭浇: ${song.name}${qualityText}`, 'success');
+        console.log(`鉁?涓嬭浇娴佺▼瀹屾垚锛屾枃浠跺悕: ${fileName}`);
 
     } catch (error) {
-        console.error('❌ 下载出错:', error);
-        showNotification('获取下载地址失败', 'error');
+        console.error('鉂?涓嬭浇鍑洪敊:', error);
+        showNotification('鑾峰彇涓嬭浇鍦板潃澶辫触', 'error');
     }
 }
 
-// 通过Blob URL下载，用于处理跨域和IDM兼容性
-async function downloadWithBlobUrl(url, filename, redirectCount = 0) {
-    // 限制重定向次数，避免无限循环
+// 閫氳繃Blob URL涓嬭浇锛岀敤浜庡鐞嗚法鍩熷拰IDM鍏煎鎬?async function downloadWithBlobUrl(url, filename, redirectCount = 0) {
+    // 闄愬埗閲嶅畾鍚戞鏁帮紝閬垮厤鏃犻檺寰幆
     if (redirectCount > 5) {
-        console.error('重定向次数过多，停止下载');
+        console.error('閲嶅畾鍚戞鏁拌繃澶氾紝鍋滄涓嬭浇');
         return;
     }
     
     try {
-        // 使用fetch获取音频数据
+        // 浣跨敤fetch鑾峰彇闊抽鏁版嵁
         const response = await fetch(url, {
             method: 'GET',
-            mode: 'cors',  // 明确指定CORS模式
+            mode: 'cors',  // 鏄庣‘鎸囧畾CORS妯″紡
             headers: {
                 'Accept': 'audio/*,application/octet-stream,*/*',
-                // 添加一些常见的请求头来提高兼容性
-                'Accept-Language': navigator.language || 'zh-CN',
+                // 娣诲姞涓€浜涘父瑙佺殑璇锋眰澶存潵鎻愰珮鍏煎鎬?                'Accept-Language': navigator.language || 'zh-CN',
                 'Referer': window.location.href,
                 'Origin': window.location.origin,
                 'Sec-Fetch-Dest': 'audio',
                 'Sec-Fetch-Mode': 'cors',
             },
-            // 禁用缓存以避免问题
-            cache: 'no-cache'
+            // 绂佺敤缂撳瓨浠ラ伩鍏嶉棶棰?            cache: 'no-cache'
         });
         
-        // 检查是否是重定向
-        if (response.status >= 300 && response.status < 400) {
+        // 妫€鏌ユ槸鍚︽槸閲嶅畾鍚?        if (response.status >= 300 && response.status < 400) {
             const redirectUrl = response.headers.get('Location') || response.headers.get('location');
             if (redirectUrl) {
-                console.log('发现重定向，使用新的URL:', redirectUrl);
+                console.log('鍙戠幇閲嶅畾鍚戯紝浣跨敤鏂扮殑URL:', redirectUrl);
                 return await downloadWithBlobUrl(redirectUrl, filename, redirectCount + 1);
             }
         }
         
         if (!response.ok) {
-            throw new Error(`下载失败: ${response.status} ${response.statusText}`);
+            throw new Error(`涓嬭浇澶辫触: ${response.status} ${response.statusText}`);
         }
         
-        // 检查响应类型
-        const contentType = response.headers.get('content-type');
-        console.log('响应内容类型:', contentType);
+        // 妫€鏌ュ搷搴旂被鍨?        const contentType = response.headers.get('content-type');
+        console.log('鍝嶅簲鍐呭绫诲瀷:', contentType);
         
-        // 如果响应是JSON（可能是API错误或重定向信息），需要特殊处理
-        if (contentType && contentType.includes('application/json')) {
+        // 濡傛灉鍝嶅簲鏄疛SON锛堝彲鑳芥槸API閿欒鎴栭噸瀹氬悜淇℃伅锛夛紝闇€瑕佺壒娈婂鐞?        if (contentType && contentType.includes('application/json')) {
             let jsonData;
             try {
                 jsonData = await response.json();
             } catch (jsonError) {
-                console.warn('无法解析JSON响应:', jsonError);
-                // 如果是302重定向但内容是HTML，尝试从headers获取location
+                console.warn('鏃犳硶瑙ｆ瀽JSON鍝嶅簲:', jsonError);
+                // 濡傛灉鏄?02閲嶅畾鍚戜絾鍐呭鏄疕TML锛屽皾璇曚粠headers鑾峰彇location
                 const location = response.headers.get('Location');
                 if (location) {
-                    console.log('从Location header获取重定向URL:', location);
+                    console.log('浠嶭ocation header鑾峰彇閲嶅畾鍚慤RL:', location);
                     return await downloadWithBlobUrl(location, filename, redirectCount + 1);
                 }
-                throw new Error('无法解析响应');
+                throw new Error('鏃犳硶瑙ｆ瀽鍝嶅簲');
             }
             
-            console.warn('API返回JSON响应而不是音频文件:', jsonData);
+            console.warn('API杩斿洖JSON鍝嶅簲鑰屼笉鏄煶棰戞枃浠?', jsonData);
             
-            // 检查是否有实际的音频URL
+            // 妫€鏌ユ槸鍚︽湁瀹為檯鐨勯煶棰慤RL
             if (jsonData.url) {
-                console.log('从JSON响应中提取音频URL:', jsonData.url);
+                console.log('浠嶫SON鍝嶅簲涓彁鍙栭煶棰慤RL:', jsonData.url);
                 return await downloadWithBlobUrl(jsonData.url, filename, redirectCount + 1);
             } else {
-                throw new Error('API返回错误信息而非音频文件');
+                throw new Error('API杩斿洖閿欒淇℃伅鑰岄潪闊抽鏂囦欢');
             }
         }
         
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(blob);
         
-        // 创建下载链接
+        // 鍒涘缓涓嬭浇閾炬帴
         const link = document.createElement('a');
         link.href = blobUrl;
         link.download = filename;
@@ -7406,39 +7299,37 @@ async function downloadWithBlobUrl(url, filename, redirectCount = 0) {
         link.click();
         document.body.removeChild(link);
         
-        // 清理blob URL以释放内存
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);  // 10秒后清理
+        // 娓呯悊blob URL浠ラ噴鏀惧唴瀛?        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);  // 10绉掑悗娓呯悊
         
-        console.log(`✅ Blob URL下载完成，文件名: ${filename}`);
+        console.log(`鉁?Blob URL涓嬭浇瀹屾垚锛屾枃浠跺悕: ${filename}`);
     } catch (error) {
-        console.warn('Blob URL下载失败，回退到直接链接:', error.message);
+        console.warn('Blob URL涓嬭浇澶辫触锛屽洖閫€鍒扮洿鎺ラ摼鎺?', error.message);
         
-        // 如果Blob方式失败，尝试直接链接方式
-        try {
-            // 使用iframe方式作为备选方案，以处理某些CORS限制
+        // 濡傛灉Blob鏂瑰紡澶辫触锛屽皾璇曠洿鎺ラ摼鎺ユ柟寮?        try {
+            // 浣跨敤iframe鏂瑰紡浣滀负澶囬€夋柟妗堬紝浠ュ鐞嗘煇浜汣ORS闄愬埗
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
             iframe.src = url;
             document.body.appendChild(iframe);
             
-            // 一段时间后移除iframe以清理DOM
+            // 涓€娈垫椂闂村悗绉婚櫎iframe浠ユ竻鐞咲OM
             setTimeout(() => {
                 if (iframe.parentNode) {
                     iframe.parentNode.removeChild(iframe);
                 }
             }, 1000);
             
-            console.log(`✅ iframe下载触发，文件名: ${filename}`);
+            console.log(`鉁?iframe涓嬭浇瑙﹀彂锛屾枃浠跺悕: ${filename}`);
         } catch (fallbackError) {
-            console.error('iframe下载也失败:', fallbackError);
+            console.error('iframe涓嬭浇涔熷け璐?', fallbackError);
             
-            // 不再使用跳转到新窗口播放，而是显示错误信息
-            console.log('所有下载方式都已尝试，如果未下载成功，请复制链接手动下载');
+            // 涓嶅啀浣跨敤璺宠浆鍒版柊绐楀彛鎾斁锛岃€屾槸鏄剧ず閿欒淇℃伅
+            console.log('鎵€鏈変笅杞芥柟寮忛兘宸插皾璇曪紝濡傛灉鏈笅杞芥垚鍔燂紝璇峰鍒堕摼鎺ユ墜鍔ㄤ笅杞?);
         }
     }
 }
 
-// 修复：移动端视图切换
+// 淇锛氱Щ鍔ㄧ瑙嗗浘鍒囨崲
 function switchMobileView(view) {
     if (view === "playlist") {
         if (dom.showPlaylistBtn) {
@@ -7465,7 +7356,7 @@ function switchMobileView(view) {
     }
 }
 
-// 修复：显示通知
+// 淇锛氭樉绀洪€氱煡
 function showNotification(message, type = "success") {
     const notification = dom.notification;
     notification.textContent = message;
@@ -7478,22 +7369,21 @@ function showNotification(message, type = "success") {
 }
 
 // ================================================
-// iOS 音频保活守卫 (最终版)
+// iOS 闊抽淇濇椿瀹堝崼 (鏈€缁堢増)
 // ================================================
 (function() {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     
-    // 只在 iOS PWA 下运行
-    if (!isIOS || !window.navigator.standalone) return;
+    // 鍙湪 iOS PWA 涓嬭繍琛?    if (!isIOS || !window.navigator.standalone) return;
     
-    console.log('🛡️ 启动 iOS 音频保活守卫');
+    console.log('馃洝锔?鍚姩 iOS 闊抽淇濇椿瀹堝崼');
     
     let audioCtx = null;
     let oscillator = null;
     let guardInterval = null;
     
-    // 初始化一个极低功耗的静音守护进程
+    // 鍒濆鍖栦竴涓瀬浣庡姛鑰楃殑闈欓煶瀹堟姢杩涚▼
     function initGuard() {
         if (audioCtx) return;
         
@@ -7503,39 +7393,36 @@ function showNotification(message, type = "success") {
         try {
             audioCtx = new AudioContext();
             
-            // 创建振荡器
-            oscillator = audioCtx.createOscillator();
+            // 鍒涘缓鎸崱鍣?            oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             
-            // 设置极低频率和增益 (人耳听不见，但硬件必须保持开启)
+            // 璁剧疆鏋佷綆棰戠巼鍜屽鐩?(浜鸿€冲惉涓嶈锛屼絾纭欢蹇呴』淇濇寔寮€鍚?
             oscillator.type = 'sine';
-            oscillator.frequency.value = 1; // 1Hz 极低频
-            gainNode.gain.value = 0.000001; // 极低增益
+            oscillator.frequency.value = 1; // 1Hz 鏋佷綆棰?            gainNode.gain.value = 0.000001; // 鏋佷綆澧炵泭
             
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
             
             oscillator.start();
             
-            console.log('🛡️ 音频保活守卫已启动');
+            console.log('馃洝锔?闊抽淇濇椿瀹堝崼宸插惎鍔?);
             
-            // 监听状态，如果被挂起则尝试恢复
+            // 鐩戝惉鐘舵€侊紝濡傛灉琚寕璧峰垯灏濊瘯鎭㈠
             guardInterval = setInterval(() => {
                 if (audioCtx && audioCtx.state === 'suspended') {
                     audioCtx.resume().then(() => {
-                        console.log('🛡️ AudioContext 已恢复');
+                        console.log('馃洝锔?AudioContext 宸叉仮澶?);
                     }).catch(e => {
-                        console.warn('🛡️ 恢复 AudioContext 失败:', e);
+                        console.warn('馃洝锔?鎭㈠ AudioContext 澶辫触:', e);
                     });
                 }
-            }, 10000); // 每10秒检查一次
-            
+            }, 10000); // 姣?0绉掓鏌ヤ竴娆?            
         } catch (error) {
-            console.error('🛡️ 音频保活守卫启动失败:', error);
+            console.error('馃洝锔?闊抽淇濇椿瀹堝崼鍚姩澶辫触:', error);
         }
     }
     
-    // 停止守卫
+    // 鍋滄瀹堝崼
     function stopGuard() {
         if (oscillator) {
             try {
@@ -7543,7 +7430,7 @@ function showNotification(message, type = "success") {
                 oscillator.disconnect();
                 oscillator = null;
             } catch (error) {
-                console.error('🛡️ 停止守卫失败:', error);
+                console.error('馃洝锔?鍋滄瀹堝崼澶辫触:', error);
             }
         }
         
@@ -7552,32 +7439,30 @@ function showNotification(message, type = "success") {
             guardInterval = null;
         }
         
-        console.log('🛡️ 音频保活守卫已停止');
+        console.log('馃洝锔?闊抽淇濇椿瀹堝崼宸插仠姝?);
     }
     
-    // 智能管理守卫状态
-    function manageGuard() {
+    // 鏅鸿兘绠＄悊瀹堝崼鐘舵€?    function manageGuard() {
         const isLockScreen = document.visibilityState === 'hidden';
         const hasActiveAudio = dom.audioPlayer && 
                                dom.audioPlayer.src && 
                                !dom.audioPlayer.paused;
         
         if (isLockScreen && !hasActiveAudio) {
-            // 锁屏且没有音乐播放时，启动守卫
-            if (!audioCtx) {
-                console.log('🛡️ 锁屏无音乐，启动音频保活');
+            // 閿佸睆涓旀病鏈夐煶涔愭挱鏀炬椂锛屽惎鍔ㄥ畧鍗?            if (!audioCtx) {
+                console.log('馃洝锔?閿佸睆鏃犻煶涔愶紝鍚姩闊抽淇濇椿');
                 initGuard();
             }
         } else {
-            // 有音乐播放或不在锁屏时，停止守卫
+            // 鏈夐煶涔愭挱鏀炬垨涓嶅湪閿佸睆鏃讹紝鍋滄瀹堝崼
             if (audioCtx) {
-                console.log('🛡️ 有音乐播放/非锁屏，停止音频保活');
+                console.log('馃洝锔?鏈夐煶涔愭挱鏀?闈為攣灞忥紝鍋滄闊抽淇濇椿');
                 stopGuard();
             }
         }
     }
 
-    // iOS 需要用户交互才能启动 AudioContext
+    // iOS 闇€瑕佺敤鎴蜂氦浜掓墠鑳藉惎鍔?AudioContext
     const activate = () => {
         initGuard();
         document.removeEventListener('click', activate);
@@ -7587,16 +7472,13 @@ function showNotification(message, type = "success") {
     document.addEventListener('click', activate);
     document.addEventListener('touchstart', activate);
     
-    // 延迟初始检查
-    setTimeout(() => {
+    // 寤惰繜鍒濆妫€鏌?    setTimeout(() => {
         manageGuard();
     }, 2000);
     
-    // 监听页面可见性变化
-    document.addEventListener('visibilitychange', manageGuard);
+    // 鐩戝惉椤甸潰鍙鎬у彉鍖?    document.addEventListener('visibilitychange', manageGuard);
     
-    // 监听音频状态变化
-    if (dom.audioPlayer) {
+    // 鐩戝惉闊抽鐘舵€佸彉鍖?    if (dom.audioPlayer) {
         dom.audioPlayer.addEventListener('play', () => {
             setTimeout(manageGuard, 500);
         });
@@ -7610,8 +7492,7 @@ function showNotification(message, type = "success") {
         });
     }
     
-    // 暴露给全局，方便调试
-    window.solaraAudioGuard = {
+    // 鏆撮湶缁欏叏灞€锛屾柟渚胯皟璇?    window.solaraAudioGuard = {
         start: initGuard,
         stop: stopGuard,
         status: () => ({
@@ -7624,45 +7505,42 @@ function showNotification(message, type = "success") {
 })();
 
 // ================================================
-// 💀 启动清理：清除所有僵尸 SW 和缓存
-// ================================================
+// 馃拃 鍚姩娓呯悊锛氭竻闄ゆ墍鏈夊兊灏?SW 鍜岀紦瀛?// ================================================
 async function exterminateServiceWorkers() {
     if (!('serviceWorker' in navigator)) return;
     try {
         const regs = await navigator.serviceWorker.getRegistrations();
         if (regs.length > 0) {
-            console.warn(`⚠️ 清除 ${regs.length} 个僵尸SW`);
+            console.warn(`鈿狅笍 娓呴櫎 ${regs.length} 涓兊灏窼W`);
             await Promise.all(regs.map(r => r.unregister()));
         }
         if ('caches' in window) {
             const keys = await caches.keys();
-            // 清理所有包含 sw 或 workbox 的缓存
-            for (const k of keys) {
+            // 娓呯悊鎵€鏈夊寘鍚?sw 鎴?workbox 鐨勭紦瀛?            for (const k of keys) {
                 if (k.includes('sw') || k.includes('workbox') || k.includes('precache')) await caches.delete(k);
             }
         }
-    } catch (e) { console.error('清理失败:', e); }
+    } catch (e) { console.error('娓呯悊澶辫触:', e); }
 }
 
 // ================================================
-// 🚀 UI 优化：移除加载遮罩 (实现秒开)
+// 馃殌 UI 浼樺寲锛氱Щ闄ゅ姞杞介伄缃?(瀹炵幇绉掑紑)
 // ================================================
 function removeLoadingMask() {
     const mask = document.getElementById('app-loading-mask');
     if (mask) {
-        mask.classList.add('loaded'); // 触发CSS淡出
-        mask.style.pointerEvents = 'none'; // 确保点击穿透
-        setTimeout(() => {
+        mask.classList.add('loaded'); // 瑙﹀彂CSS娣″嚭
+        mask.style.pointerEvents = 'none'; // 纭繚鐐瑰嚮绌块€?        setTimeout(() => {
             if (mask.parentNode) mask.parentNode.removeChild(mask);
         }, 600);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. 立即清理僵尸进程
+    // 1. 绔嬪嵆娓呯悊鍍靛案杩涚▼
     exterminateServiceWorkers();
     
-    // 2. 初始化播放器
+    // 2. 鍒濆鍖栨挱鏀惧櫒
     const player = dom.audioPlayer;
     if (player) {
         player.removeAttribute('crossOrigin');
@@ -7670,18 +7548,17 @@ document.addEventListener('DOMContentLoaded', () => {
         player.setAttribute('playsinline', '');
         player.setAttribute('webkit-playsinline', '');
         
-        // 监控是否静音
+        // 鐩戞帶鏄惁闈欓煶
         player.addEventListener('volumechange', () => {
-             if(player.muted || player.volume === 0) console.warn('⚠️ 播放器变为静音状态');
+             if(player.muted || player.volume === 0) console.warn('鈿狅笍 鎾斁鍣ㄥ彉涓洪潤闊崇姸鎬?);
         });
         
         player.addEventListener('canplaythrough', () => { player.preload = "auto"; }, { once: true });
     }
     
-    // 3. 🚀 关键：JS加载完毕立即移除遮罩
-    // 稍微延迟一点点，确保 CSS 渲染完成，避免界面闪烁
-    setTimeout(removeLoadingMask, 100);
+    // 3. 馃殌 鍏抽敭锛欽S鍔犺浇瀹屾瘯绔嬪嵆绉婚櫎閬僵
+    // 绋嶅井寤惰繜涓€鐐圭偣锛岀‘淇?CSS 娓叉煋瀹屾垚锛岄伩鍏嶇晫闈㈤棯鐑?    setTimeout(removeLoadingMask, 100);
 });
 
-// 作为兜底，如果 load 事件触发（所有资源加载完），也尝试移除
-window.addEventListener('load', () => setTimeout(removeLoadingMask, 200));
+// 浣滀负鍏滃簳锛屽鏋?load 浜嬩欢瑙﹀彂锛堟墍鏈夎祫婧愬姞杞藉畬锛夛紝涔熷皾璇曠Щ闄?window.addEventListener('load', () => setTimeout(removeLoadingMask, 200));
+
