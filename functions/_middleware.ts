@@ -9,8 +9,8 @@ export async function onRequest(context: any) {
     const url = new URL(request.url);
     const pathname = url.pathname;
     
-    // 1. 直接放行登录页面和所有API请求
-    if (pathname === '/login' || pathname.startsWith('/api/')) {
+    // 1. 直接放行登录页面、所有API请求和palette功能
+    if (pathname === '/login' || pathname.startsWith('/api/') || pathname === '/palette') {
       return context.next();
     }
     
