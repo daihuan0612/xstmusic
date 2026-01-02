@@ -1,5 +1,6 @@
 const API_BASE_URL = "https://music-dl.sayqz.com/api";
 const KUWO_HOST_PATTERN = /(^|\.)kuwo\.cn$/i;
+const QQ_MUSIC_HOST_PATTERN = /(^|\.)qq\.com$/i;
 const SAFE_RESPONSE_HEADERS = ["content-type", "cache-control", "accept-ranges", "content-length", "content-range", "etag", "last-modified", "expires", "x-source-switch"];
 
 function createCorsHeaders(init?: Headers): Headers {
@@ -30,15 +31,15 @@ function handleOptions(): Response {
   });
 }
 
-function isAllowedKuwoHost(hostname: string): boolean {
+function isAllowedHost(hostname: string): boolean {
   if (!hostname) return false;
-  return KUWO_HOST_PATTERN.test(hostname);
+  return KUWO_HOST_PATTERN.test(hostname) || QQ_MUSIC_HOST_PATTERN.test(hostname);
 }
 
-function normalizeKuwoUrl(rawUrl: string): URL | null {
+function normalizeUrl(rawUrl: string): URL | null {
   try {
     const parsed = new URL(rawUrl);
-    if (!isAllowedKuwoHost(parsed.hostname)) {
+    if (!isAllowedHost(parsed.hostname)) {
       return null;
     }
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
@@ -51,8 +52,8 @@ function normalizeKuwoUrl(rawUrl: string): URL | null {
   }
 }
 
-async function proxyKuwoAudio(targetUrl: string, request: Request): Promise<Response> {
-  const normalized = normalizeKuwoUrl(targetUrl);
+async function proxyAudio(targetUrl: string, request: Request): Promise<Response> {
+  const normalized = normalizeUrl(targetUrl);
   if (!normalized) {
     return new Response("Invalid target", { status: 400 });
   }
@@ -61,7 +62,7 @@ async function proxyKuwoAudio(targetUrl: string, request: Request): Promise<Resp
     method: request.method,
     headers: {
       "User-Agent": request.headers.get("User-Agent") ?? "Mozilla/5.0",
-      "Referer": "https://www.kuwo.cn/",
+      "Referer": normalized.hostname.includes("kuwo") ? "https://www.kuwo.cn/" : "https://y.qq.com/",
     },
   };
 
@@ -124,7 +125,7 @@ export async function onRequest({ request }: { request: Request }): Promise<Resp
   const target = url.searchParams.get("target");
 
   if (target) {
-    return proxyKuwoAudio(target, request);
+    return proxyAudio(target, request);
   }
 
   const pathname = url.pathname;
