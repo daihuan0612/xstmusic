@@ -2201,57 +2201,6 @@ async function fetchPaletteData(imageUrl) {
         persistPaletteCache();
         return defaultPalette;
     }
-    
-    // 对于QQ音乐的图片，使用基于URL的哈希生成不同的主题色
-    if (imageUrl.includes('qq.com')) {
-        console.log('🎵 QQ音乐图片，使用基于URL的主题色生成');
-        
-        // 使用更复杂的哈希算法，确保不同图片生成不同颜色
-        const hash = imageUrl.split('?')[0].split('/').pop() || '';
-        let hashValue = 0;
-        for (let i = 0; i < hash.length; i++) {
-            const char = hash.charCodeAt(i);
-            hashValue = (hashValue << 5) - hashValue + char;
-            hashValue = hashValue & hashValue;
-        }
-        
-        // 生成更丰富的颜色变化
-        const hue = Math.abs(hashValue % 360);
-        const saturation = 55 + Math.abs(hashValue % 25); // 55-80%
-        const lightness = 60 + Math.abs(hashValue % 20); // 60-80%
-        
-        // 转换为十六进制颜色
-        const r = Math.round(255 * (1 - Math.abs((hue / 60) % 2 - 1)) * saturation / 100 * lightness / 100);
-        const g = Math.round(255 * (1 - Math.abs((hue / 60 - 2) % 2 - 1)) * saturation / 100 * lightness / 100);
-        const b = Math.round(255 * (1 - Math.abs((hue / 60 - 4) % 2 - 1)) * saturation / 100 * lightness / 100);
-        const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-        
-        // 创建QQ音乐专用调色板
-        const qqPalette = {
-            gradients: {
-                light: {
-                    gradient: `linear-gradient(135deg, ${hex} 0%, ${hex}cc 50%, ${hex}99 100%)`
-                },
-                dark: {
-                    gradient: `linear-gradient(135deg, ${hex}55 0%, ${hex}66 50%, ${hex}77 100%)`
-                }
-            },
-            tokens: {
-                light: {
-                    primaryColor: hex,
-                    primaryColorDark: hex
-                },
-                dark: {
-                    primaryColor: hex,
-                    primaryColorDark: hex
-                }
-            }
-        };
-        
-        paletteCache.set(imageUrl, qqPalette);
-        persistPaletteCache();
-        return qqPalette;
-    }
 
     try {
         console.log('🔍 尝试本地取色');
