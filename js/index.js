@@ -2137,8 +2137,8 @@ function getLocalPalette(imageUrl) {
                     // 清理对象URL以释放内存
                     URL.revokeObjectURL(objectUrl);
                 }
-            };
-            
+            }
+                        
             img.onerror = () => {
                 console.error('❌ 图片加载失败，使用默认调色板');
                 
@@ -2354,6 +2354,7 @@ function getLocalPalette(imageUrl) {
                     };
                     resolve(fallbackPalette);
                 }
+            }
             
             img.onerror = () => {
                 console.error('❌ 图片加载失败，使用默认调色板');
