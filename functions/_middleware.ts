@@ -15,8 +15,14 @@ export async function onRequest(context: any) {
     }
     
     // 2. 直接放行静态资源
-    const staticExtensions = ['.css', '.js', '.png', '.svg', '.jpg', '.jpeg', '.gif', '.ico', '.webp', '.woff', '.woff2'];
-    const isStatic = staticExtensions.some(ext => pathname.endsWith(ext));
+    // 先处理带查询参数的URL，只取路径部分判断
+    const pathWithoutQuery = pathname.split('?')[0];
+    const staticExtensions = [
+      '.css', '.js', '.png', '.svg', '.jpg', '.jpeg', '.gif', 
+      '.ico', '.webp', '.avif', '.bmp', '.tiff', '.mp3', '.wav', 
+      '.woff', '.woff2', '.ttf', '.otf', '.json', '.txt'
+    ];
+    const isStatic = staticExtensions.some(ext => pathWithoutQuery.endsWith(ext));
     if (isStatic) {
       return context.next();
     }
