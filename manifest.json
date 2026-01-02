@@ -1,0 +1,44 @@
+{
+  "name": "小石头Music",
+  "short_name": "小石头Music",
+  "description": "一个优雅的音乐播放器",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090f",
+  "theme_color": "#1abc9c",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon1.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "搜索音乐",
+      "short_name": "搜索",
+      "description": "搜索你喜欢的音乐",
+      "url": "/?action=search",
+      "icons": [{ "src": "/favicon.png", "sizes": "32x32" }]
+    }
+  ],
+  "categories": ["entertainment", "music"],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "dir": "ltr",
+  "lang": "zh-CN"
+}
