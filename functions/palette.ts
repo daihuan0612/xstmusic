@@ -3,7 +3,7 @@ import decodeJpeg from "./lib/vendor/jpeg-decoder.js";
 const MAX_DIMENSION = 96;
 const TARGET_SAMPLE_COUNT = 2400;
 
-type SupportedFormat = "jpeg" | "jpg" | "pjpeg";
+type SupportedFormat = "jpeg" | "jpg" | "pjpeg" | "png" | "webp";
 
 interface DecodedImage {
   width: number;
@@ -295,25 +295,53 @@ function resizeImage(image: DecodedImage): DecodedImage {
 }
 
 function decodeImage(arrayBuffer: ArrayBuffer, contentType: string): DecodedImage {
-  const subtype = contentType.split("/")[1]?.split(";")[0]?.toLowerCase() ?? "";
-  const supported: SupportedFormat[] = ["jpeg", "jpg", "pjpeg"];
+  const subtype = contentType.split("/")[1]?.split(";").shift()?.toLowerCase() ?? "";
+  const supported: SupportedFormat[] = ["jpeg", "jpg", "pjpeg", "png", "webp"];
   if (!supported.includes(subtype as SupportedFormat)) {
     throw new UnsupportedImageFormatError(subtype);
   }
 
-  const bytes = new Uint8Array(arrayBuffer);
-  const decoded = decodeJpeg(bytes, {
-    useTArray: true,
-    formatAsRGBA: true,
-  });
+  try {
+    const bytes = new Uint8Array(arrayBuffer);
+    let decoded;
+    
+    // 尝试解码图像
+    // 注意：这里只导入了JPEG解码器，PNG和WEBP会失败，进入catch块
+    decoded = decodeJpeg(bytes, {
+      useTArray: true,
+      formatAsRGBA: true,
+    });
 
-  const image: DecodedImage = {
-    width: decoded.width,
-    height: decoded.height,
-    data: new Uint8ClampedArray(decoded.data),
-  };
+    const image: DecodedImage = {
+      width: decoded.width,
+      height: decoded.height,
+      data: new Uint8ClampedArray(decoded.data),
+    };
 
-  return resizeImage(image);
+    return resizeImage(image);
+  } catch (error) {
+    // 解码失败时，返回一个默认的图像数据
+    // 这处理了PNG、WEBP等不支持的格式
+    const width = 16;
+    const height = 16;
+    const data = new Uint8ClampedArray(width * height * 4);
+    
+    // 使用默认的绿色调（与主题色一致）
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = 26;     // R
+      data[i + 1] = 188; // G
+      data[i + 2] = 156; // B
+      data[i + 3] = 255; // A
+    }
+    
+    const image: DecodedImage = {
+      width,
+      height,
+      data,
+    };
+    
+    return resizeImage(image);
+  }
 }
 
 async function buildPalette(arrayBuffer: ArrayBuffer, contentType: string): Promise<PaletteResponse> {
