@@ -1,5 +1,6 @@
 const API_BASE_URL = "https://music-dl.sayqz.com/api";
 const KUWO_HOST_PATTERN = /(^|\.)kuwo\.cn$/i;
+const IMAGE_HOSTS_PATTERN = /\.(qq\.com|y\.qq\.com|tencent\.com|qpic\.cn|music\.tencent\.com|cdn\.music\.tencent\.com|126\.net|netease\.com|music\.163\.com)$/i;
 const SAFE_RESPONSE_HEADERS = ["content-type", "cache-control", "accept-ranges", "content-length", "content-range", "etag", "last-modified", "expires", "x-source-switch"];
 
 function createCorsHeaders(init?: Headers): Headers {
@@ -83,6 +84,51 @@ async function proxyKuwoAudio(targetUrl: string, request: Request): Promise<Resp
   });
 }
 
+async function proxyImage(targetUrl: string, request: Request): Promise<Response> {
+  try {
+    const parsedUrl = new URL(targetUrl);
+    
+    // Only allow image proxying for known image hosts
+    if (!IMAGE_HOSTS_PATTERN.test(parsedUrl.hostname)) {
+      return new Response("Invalid image host", { status: 400 });
+    }
+    
+    if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+      return new Response("Invalid protocol", { status: 400 });
+    }
+    
+    // Set appropriate referer based on the hostname
+    let referer = "https://y.qq.com/";
+    if (parsedUrl.hostname.includes("163.com") || parsedUrl.hostname.includes("netease.com")) {
+      referer = "https://music.163.com/";
+    } else if (parsedUrl.hostname.includes("kuwo.cn")) {
+      referer = "https://www.kuwo.cn/";
+    }
+    
+    const upstream = await fetch(parsedUrl.toString(), {
+      headers: {
+        "User-Agent": request.headers.get("User-Agent") ?? "Mozilla/5.0",
+        "Accept": "image/*",
+        "Referer": request.headers.get("Referer") ?? referer,
+      },
+    });
+    
+    const headers = createCorsHeaders(upstream.headers);
+    if (!headers.has("Cache-Control")) {
+      headers.set("Cache-Control", "public, max-age=3600");
+    }
+    
+    return new Response(upstream.body, {
+      status: upstream.status,
+      statusText: upstream.statusText,
+      headers,
+    });
+  } catch (error) {
+    console.error("Image proxy error:", error);
+    return new Response("Proxy error", { status: 500 });
+  }
+}
+
 async function proxyApiRequest(url: URL, request: Request): Promise<Response> {
   const apiUrl = new URL(API_BASE_URL, "https://music-dl.sayqz.com");
   url.searchParams.forEach((value, key) => {
@@ -121,13 +167,25 @@ export async function onRequest({ request }: { request: Request }): Promise<Resp
   }
 
   const url = new URL(request.url);
+  const pathname = url.pathname;
   const target = url.searchParams.get("target");
+  const imageUrl = url.searchParams.get("url");
 
   if (target) {
     return proxyKuwoAudio(target, request);
   }
-
-  const pathname = url.pathname;
+  
+  // Handle image proxying
+  if (imageUrl && pathname === "/") {
+    try {
+      const parsed = new URL(decodeURIComponent(imageUrl));
+      if (IMAGE_HOSTS_PATTERN.test(parsed.hostname)) {
+        return proxyImage(decodeURIComponent(imageUrl), request);
+      }
+    } catch (e) {
+      // Invalid URL, continue to other handlers
+    }
+  }
 
   if (pathname === "/status" || pathname === "/health") {
     return proxyApiRequest(url, request);
