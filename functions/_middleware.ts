@@ -1,80 +1,50 @@
-const PUBLIC_PATH_PATTERNS = [/^\/login(?:\/|$)/, /^\/api\/login(?:\/|$)/];
-const PUBLIC_FILE_EXTENSIONS = new Set([
-  ".css",
-  ".js",
-  ".png",
-  ".svg",
-  ".jpg",
-  ".jpeg",
-  ".gif",
-  ".webp",
-  ".ico",
-  ".txt",
-  ".map",
-  ".json",
-  ".woff",
-  ".woff2",
-]);
-
-function hasPublicExtension(pathname: string): boolean {
-  const lastDotIndex = pathname.lastIndexOf(".");
-  if (lastDotIndex === -1) {
-    return false;
-  }
-  const extension = pathname.slice(lastDotIndex).toLowerCase();
-  return PUBLIC_FILE_EXTENSIONS.has(extension);
-}
-
-function isPublicPath(pathname: string): boolean {
-  return (
-    PUBLIC_PATH_PATTERNS.some((pattern) => pattern.test(pathname)) ||
-    hasPublicExtension(pathname)
-  );
-}
+// 简化版中间件 - 确保网站能够正常访问
+// 只处理登录验证，避免复杂逻辑导致服务崩溃
 
 export async function onRequest(context: any) {
   const { request, env } = context;
-  const url = new URL(request.url);
-  const pathname = url.pathname;
   
   try {
-    // 允许访问登录页面和登录API
+    // 解析URL
+    const url = new URL(request.url);
+    const pathname = url.pathname;
+    
+    // 1. 直接放行登录页面和登录API
     if (pathname === '/login' || pathname === '/api/login') {
       return context.next();
     }
     
-    // 允许访问静态资源
-    const isStaticResource = hasPublicExtension(pathname);
-    if (isStaticResource) {
+    // 2. 直接放行静态资源
+    const staticExtensions = ['.css', '.js', '.png', '.svg', '.jpg', '.jpeg', '.gif', '.ico', '.webp', '.woff', '.woff2'];
+    const isStatic = staticExtensions.some(ext => pathname.endsWith(ext));
+    if (isStatic) {
       return context.next();
     }
     
-    const password = String(env.PASSWORD || "");
+    // 3. 获取密码配置
+    const password = env.PASSWORD;
     
-    // 如果未设置密码，直接放行
-    if (password === "") {
+    // 4. 如果未设置密码，直接放行所有请求
+    if (!password) {
       return context.next();
     }
     
-    // 验证身份：检查cookie
+    // 5. 简单的密码验证逻辑
     const cookie = request.headers.get('Cookie') || '';
-    const authCookie = cookie.split(';').find(c => c.trim().startsWith('auth='));
+    const expectedAuth = `auth=${btoa(String(password))}`;
     
-    if (authCookie) {
-      const authValue = authCookie.split('=')[1].trim();
-      // 验证auth cookie是否正确
-      if (authValue === btoa(password)) {
-        return context.next();
-      }
+    // 6. 如果cookie匹配，放行请求
+    if (cookie.includes(expectedAuth)) {
+      return context.next();
     }
     
-    // 未登录或密码错误，重定向到登录页
-    // 构造绝对URL，避免重定向问题
-    const loginUrl = new URL('/login', url.origin);
-    return Response.redirect(loginUrl.toString(), 302);
+    // 7. 否则重定向到登录页
+    const loginUrl = `${url.origin}/login`;
+    return Response.redirect(loginUrl, 302);
+    
   } catch (error) {
-    // 出错时直接放行，避免服务崩溃
-    console.error('Middleware error:', error);
+    // 任何错误都直接放行，确保网站能够访问
+    console.error('Middleware error - allowing request to proceed:', error);
     return context.next();
   }
 }
